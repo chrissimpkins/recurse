@@ -5,7 +5,15 @@ use structopt::StructOpt;
 
 use walkdir::{DirEntry, WalkDir};
 
-#[derive(StructOpt)]
+pub(crate) mod command;
+pub(crate) mod config;
+
+use command::find::FindCommand;
+use command::replace::ReplaceCommand;
+use command::Command;
+use config::Config;
+/// The command line argument implementation
+#[derive(StructOpt, Debug)]
 #[structopt(about = "Text manipulation tool for files")]
 enum Shot {
     Find {
@@ -38,8 +46,20 @@ enum Shot {
     },
 }
 
+/// `shot` executable execution entry point
 pub fn run() -> Result<()> {
-    let opt = Shot::from_args();
-    // TODO: implement
-    Ok(())
+    let config = Config::new(Shot::from_args());
+    match &config.subcmd {
+        Shot::Find {
+            extension: _,
+            find: _,
+            inpath: _,
+        } => FindCommand::execute(config),
+        Shot::Replace {
+            extension: _,
+            find: _,
+            replace: _,
+            inpath: _,
+        } => ReplaceCommand::execute(config),
+    }
 }
