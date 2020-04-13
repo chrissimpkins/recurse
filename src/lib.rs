@@ -1,10 +1,8 @@
-use std::fs;
-use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::process;
 
 use anyhow::{Context, Result};
 use structopt::StructOpt;
+
 use walkdir::{DirEntry, WalkDir};
 
 #[derive(StructOpt)]
@@ -40,15 +38,7 @@ enum Shot {
     },
 }
 
-fn main() -> Result<()> {
-    if let Err(error) = run() {
-        let _ = writeln!(io::stderr(), "Error: {}", error);
-        process::exit(1);
-    }
-    process::exit(0);
-}
-
-fn run() -> Result<()> {
+pub fn run() -> Result<()> {
     let opt = Shot::from_args();
     // TODO: implement
     Ok(())
