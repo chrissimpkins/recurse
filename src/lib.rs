@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use structopt::StructOpt;
 
 use walkdir::{DirEntry, WalkDir};
@@ -47,19 +47,25 @@ enum Shot {
 }
 
 /// `shot` executable execution entry point
-pub fn run() -> Result<()> {
+pub fn run() -> Result<String> {
     let config = Config::new(Shot::from_args());
     match &config.subcmd {
         Shot::Find {
             extension: _,
             find: _,
             inpath: _,
-        } => FindCommand::execute(config),
+        } => match FindCommand::execute(config) {
+            Ok(stdout) => Ok(stdout),
+            Err(error) => Err(error),
+        },
         Shot::Replace {
             extension: _,
             find: _,
             replace: _,
             inpath: _,
-        } => ReplaceCommand::execute(config),
+        } => match ReplaceCommand::execute(config) {
+            Ok(stdout) => Ok(stdout),
+            Err(error) => Err(error),
+        },
     }
 }
