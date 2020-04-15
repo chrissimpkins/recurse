@@ -17,6 +17,27 @@ where
     }
 }
 
+/// Returns a boolean that indicates whether there is a dot directory
+/// or dot file anywhere in the canonical absolute path to the file.
+/// This is used as a filter during execution and requires a valid
+/// file or directory path.  Panic is raised if the path is not valid.
+pub(crate) fn path_is_hidden<P>(filepath: P) -> bool
+where
+    P: Into<PathBuf>,
+{
+    match filepath.into().canonicalize() {
+        Ok(pb) => {
+            for path in pb.iter() {
+                if path.to_string_lossy().starts_with(".") {
+                    return true;
+                }
+            }
+            false
+        }
+        Err(_) => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -32,5 +53,23 @@ mod tests {
     fn test_get_absolute_filepath_bad_path() {
         let testpath = get_absolute_filepath("./bogus.bad");
         assert!(testpath.is_err());
+    }
+
+    #[test]
+    fn test_path_is_hidden_with_dotfile() {
+        let testpath = Path::new("./tests/testfiles/path/.testfile");
+        assert!(path_is_hidden(testpath));
+    }
+
+    #[test]
+    fn test_path_is_hidden_with_dotdir() {
+        let testpath = Path::new("./tests/testfiles/.dotdir/testfile");
+        assert!(path_is_hidden(testpath));
+    }
+
+    #[test]
+    fn test_path_is_not_hidden_without_dotfile_or_dotdir() {
+        let testpath = Path::new("./tests/testfiles/path/testfile");
+        assert_eq!(path_is_hidden(testpath), false);
     }
 }
