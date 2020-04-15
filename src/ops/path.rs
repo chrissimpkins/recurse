@@ -25,7 +25,7 @@ pub(crate) fn path_is_hidden<P>(filepath: P) -> bool
 where
     P: Into<PathBuf>,
 {
-    match filepath.into().canonicalize() {
+    match get_absolute_filepath(filepath) {
         Ok(pb) => {
             for path in pb.iter() {
                 if path.to_string_lossy().starts_with(".") {
