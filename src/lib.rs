@@ -7,6 +7,7 @@ use walkdir::{DirEntry, WalkDir};
 
 pub(crate) mod command;
 pub(crate) mod config;
+pub(crate) mod ops;
 
 use command::find::FindCommand;
 use command::replace::ReplaceCommand;
