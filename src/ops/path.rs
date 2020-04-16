@@ -9,9 +9,9 @@ use anyhow::{anyhow, Result};
 /// - A non-final component in path is not a directory.
 pub(crate) fn get_absolute_filepath<P>(filepath: P) -> Result<PathBuf>
 where
-    P: Into<PathBuf>,
+    P: AsRef<Path>,
 {
-    match filepath.into().canonicalize() {
+    match filepath.as_ref().canonicalize() {
         Ok(pb) => Ok(pb),
         Err(error) => Err(anyhow!(error)),
     }
@@ -22,9 +22,9 @@ where
 /// cases where the filepath does not exist or there is no extension.
 pub(crate) fn path_has_extension<P>(filepath: P, extension: &str) -> bool
 where
-    P: Into<PathBuf>,
+    P: AsRef<Path>,
 {
-    match filepath.into().extension() {
+    match filepath.as_ref().extension() {
         Some(ext) => {
             // permissive comparison of the extension
             // allows for use of period character in
@@ -46,7 +46,7 @@ where
 /// file or directory path.  Panic is raised if the path is not valid.
 pub(crate) fn path_is_hidden<P>(filepath: P) -> bool
 where
-    P: Into<PathBuf>,
+    P: AsRef<Path>,
 {
     match get_absolute_filepath(filepath) {
         Ok(pb) => {
