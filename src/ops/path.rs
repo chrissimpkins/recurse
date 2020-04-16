@@ -30,11 +30,11 @@ where
             // allows for use of period character in
             // the parameter (e.g., `.txt`)
             if extension.starts_with(".") {
-                return ext.to_string_lossy() == &extension[1..];
+                return ext.to_str().unwrap() == &extension[1..];
             }
             // or no period character in the extension
             // parameter (e.g., `txt`)
-            return ext.to_string_lossy() == extension;
+            return ext.to_str().unwrap() == extension;
         }
         None => return false,
     }
@@ -51,7 +51,7 @@ where
     match get_absolute_filepath(filepath) {
         Ok(pb) => {
             for path in pb.iter() {
-                if path.to_string_lossy().starts_with(".") {
+                if path.to_str().unwrap().starts_with(".") {
                     return true;
                 }
             }
@@ -112,6 +112,16 @@ mod tests {
     fn test_path_is_hidden_with_dotfile() {
         let testpath = Path::new("./tests/testfiles/path/.testfile");
         assert!(path_is_hidden(testpath));
+        assert!(path_is_hidden(testpath)); // confirm that we do not transfer ownership
+    }
+
+    #[test]
+    fn test_path_is_hidden_with_dotfile_pathbuf() {
+        let testpath = PathBuf::from("./tests/testfiles/path/.testfile");
+        // Owned types need to be borrowed or ownership is relinquished and
+        // raises panic
+        assert!(path_is_hidden(&testpath)); // addressed by using &testpath
+        assert!(path_is_hidden(testpath)); // ownership transitions on this call
     }
 
     #[test]
