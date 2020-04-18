@@ -16,7 +16,7 @@ use command::Command;
 use config::Config;
 /// The command line argument implementation
 #[derive(StructOpt, Debug)]
-#[structopt(about = "Text manipulation tool for files")]
+#[structopt(about = "A shotgun for text files")]
 enum Shot {
     #[structopt(about = "Find text in files")]
     Find {
