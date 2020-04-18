@@ -108,4 +108,19 @@ mod tests {
         }
         assert_eq!(index, 3);
     }
+
+    #[test]
+    fn test_walk_with_dir_set_min_depth() {
+        let mut dirpaths = walk("./tests/testfiles/io/depthtests", Some(3), None);
+        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", Some(3), None);
+        let expected_list = [Path::new(
+            "./tests/testfiles/io/depthtests/depth2/depth3/test3.txt",
+        )];
+        assert!(expected_list.contains(&dirpaths.next().unwrap().unwrap().path()));
+        let mut index = 0;
+        for _ in dirpaths_len_check {
+            index += 1;
+        }
+        assert_eq!(index, 1);
+    }
 }
