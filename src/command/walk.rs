@@ -9,7 +9,6 @@ pub(crate) struct WalkCommand {}
 
 impl Command for WalkCommand {
     fn execute(subcmd: Shot) -> Result<String> {
-        // TODO: add support for follow symbolic links
         if let Shot::Walk {
             extension,
             hidden,
