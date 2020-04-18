@@ -8,7 +8,7 @@ use shot::run;
 fn main() -> Result<()> {
     match run() {
         Ok(stdout) => {
-            println!("{}", stdout);
+            println!("{}", stdout.trim());
             process::exit(0);
         }
         Err(error) => {
