@@ -24,7 +24,7 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_walk_with_dir() {
+    fn test_walk_with_dir_default_depth() {
         let mut dirpaths = walk("./tests/testfiles/io/stablepaths", None, None);
         let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", None, None);
         let expected_list = [
@@ -50,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_file() {
+    fn test_walk_with_file_default_depth() {
         let mut filepaths = walk("./tests/testfiles/io/stablepaths/README.md", None, None);
         let filepaths_len_check = walk("./tests/testfiles/io/stablepaths/README.md", None, None);
 
@@ -67,7 +67,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_filter_map() {
+    fn test_walk_with_filter_map_default_depth() {
         let expected_list = [
             PathBuf::from("./tests/testfiles/io/stablepaths/test"),
             PathBuf::from("./tests/testfiles/io/stablepaths/README.md"),
@@ -88,5 +88,24 @@ mod tests {
         assert!(expected_list.contains(&file_entries.next().unwrap()));
         assert!(expected_list.contains(&file_entries.next().unwrap()));
         assert_eq!(file_entries.next(), None); // the above should have exhausted the file paths in the test
+    }
+
+    #[test]
+    fn test_walk_with_dir_set_max_depth() {
+        let mut dirpaths = walk("./tests/testfiles/io/depthtests", None, Some(1));
+        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", None, Some(1));
+        let expected_list = [
+            Path::new("./tests/testfiles/io/depthtests"),
+            Path::new("./tests/testfiles/io/depthtests/test.txt"),
+            Path::new("./tests/testfiles/io/depthtests/depth2"),
+        ];
+        assert!(expected_list.contains(&dirpaths.next().unwrap().unwrap().path()));
+        assert!(expected_list.contains(&dirpaths.next().unwrap().unwrap().path()));
+        assert!(expected_list.contains(&dirpaths.next().unwrap().unwrap().path()));
+        let mut index = 0;
+        for _ in dirpaths_len_check {
+            index += 1;
+        }
+        assert_eq!(index, 3);
     }
 }
