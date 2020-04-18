@@ -4,8 +4,8 @@ pub(crate) mod find;
 pub(crate) mod replace;
 pub(crate) mod walk;
 
-use crate::Config;
+use crate::Shot;
 
 pub(crate) trait Command {
-    fn execute(config: Config) -> Result<String>;
+    fn execute(subcmd: Shot) -> Result<String>;
 }

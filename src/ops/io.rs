@@ -4,11 +4,18 @@ use std::path::Path;
 
 use walkdir::{IntoIter, WalkDir};
 
-pub(crate) fn walk<P>(path: P) -> IntoIter
+pub(crate) fn walk<P>(path: P, mindepth: Option<usize>, maxdepth: Option<usize>) -> IntoIter
 where
     P: AsRef<Path>,
 {
-    WalkDir::new(path).into_iter()
+    let mut wd = WalkDir::new(path);
+    if maxdepth.is_some() {
+        wd = wd.max_depth(maxdepth.unwrap());
+    }
+    if mindepth.is_some() {
+        wd = wd.min_depth(mindepth.unwrap());
+    }
+    wd.into_iter()
 }
 
 #[cfg(test)]
@@ -18,8 +25,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_dir() {
-        let mut dirpaths = walk("./tests/testfiles/io/stablepaths");
-        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths");
+        let mut dirpaths = walk("./tests/testfiles/io/stablepaths", None, None);
+        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", None, None);
         let expected_list = [
             Path::new("./tests/testfiles/io/stablepaths"),
             Path::new("./tests/testfiles/io/stablepaths/test"),
@@ -44,8 +51,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_file() {
-        let mut filepaths = walk("./tests/testfiles/io/stablepaths/README.md");
-        let filepaths_len_check = walk("./tests/testfiles/io/stablepaths/README.md");
+        let mut filepaths = walk("./tests/testfiles/io/stablepaths/README.md", None, None);
+        let filepaths_len_check = walk("./tests/testfiles/io/stablepaths/README.md", None, None);
 
         assert_eq!(
             filepaths.next().unwrap().unwrap().path(),
@@ -68,7 +75,7 @@ mod tests {
         ];
         // filter_map to filter out directories that process does not have permission
         // to access
-        let mut file_entries = walk("./tests/testfiles/io/stablepaths")
+        let mut file_entries = walk("./tests/testfiles/io/stablepaths", None, None)
             .filter_map(|f| f.ok())
             .filter_map(|f| {
                 if f.path().is_file() {
