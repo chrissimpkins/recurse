@@ -29,7 +29,7 @@ impl Command for WalkCommand {
                     }
                 });
 
-            let mut stdout_string = String::from("");
+            let mut stdout_string = String::new();
             for filepath in file_entries {
                 // =================
                 // File path filters
