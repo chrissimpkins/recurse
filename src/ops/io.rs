@@ -1,5 +1,3 @@
-// use std::fs;
-// use std::io::{self, Write};
 use std::path::Path;
 
 use walkdir::{IntoIter, WalkDir};

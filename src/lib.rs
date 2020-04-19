@@ -1,9 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use anyhow::Result;
 use structopt::StructOpt;
-
-use walkdir::{DirEntry, WalkDir};
 
 pub(crate) mod command;
 pub(crate) mod config;
