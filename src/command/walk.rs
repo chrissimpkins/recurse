@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 
 use crate::command::Command;
 use crate::ops::io::walk;
-use crate::ops::path::path_is_hidden;
+use crate::ops::path::{path_has_extension, path_is_hidden};
 use crate::Shot;
 
 pub(crate) struct WalkCommand {}
@@ -39,14 +39,9 @@ impl Command for WalkCommand {
                     continue;
                 } else if has_extension_filter {
                     // if user requested extension filter, filter on it
-                    match filepath.extension() {
-                        Some(ext) => {
-                            if &ext.to_string_lossy() == extension.as_ref().unwrap() {
-                                stdout_string.push_str(&filepath.to_string_lossy());
-                                stdout_string.push_str("\n");
-                            }
-                        }
-                        None => {}
+                    if path_has_extension(&filepath, extension.as_ref().unwrap()) {
+                        stdout_string.push_str(&filepath.to_string_lossy());
+                        stdout_string.push_str("\n");
                     }
                 } else {
                     stdout_string.push_str(&filepath.to_string_lossy());
