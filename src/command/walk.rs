@@ -15,10 +15,11 @@ impl Command for WalkCommand {
             inpath,
             mindepth,
             maxdepth,
+            symlinks,
         } = subcmd
         {
             let has_extension_filter = extension.is_some();
-            let file_entries = walk(inpath, mindepth, maxdepth)
+            let file_entries = walk(inpath, mindepth, maxdepth, symlinks)
                 .filter_map(|f| f.ok()) // filter paths that process does not have permission to edit
                 .filter_map(|f| {
                     // filter paths on *files only* (i.e., eliminate dir paths, we don't need them)

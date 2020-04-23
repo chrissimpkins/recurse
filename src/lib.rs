@@ -68,6 +68,11 @@ enum Shot {
         /// Define the maximum depth of the directory traversal
         #[structopt(long = "maxdepth", help = "Maximum directory depth")]
         maxdepth: Option<usize>,
+
+        /// Follow symbolic links
+        /// Default is to not follow symbolic links
+        #[structopt(long = "symlinks", help = "Follow symbolic links")]
+        symlinks: bool,
     },
 }
 
@@ -92,6 +97,7 @@ pub fn run() -> Result<String> {
             inpath: _,
             mindepth: _,
             maxdepth: _,
+            symlinks: _,
         } => return WalkCommand::execute(config.subcmd),
     }
 }
