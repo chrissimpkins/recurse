@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use rayon::prelude::*;
 
 use crate::command::Command;
 use crate::ops::io::walk;
