@@ -6,8 +6,8 @@ use crate::Shot;
 pub(crate) struct FindCommand {}
 
 impl Command for FindCommand {
-    fn execute(subcmd: Shot) -> Result<String> {
-        Ok(String::from("Test string"))
+    fn execute(subcmd: Shot) -> Result<()> {
+        Ok(())
         // Err(anyhow!("test error"))
     }
 }

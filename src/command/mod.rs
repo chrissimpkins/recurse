@@ -8,5 +8,5 @@ pub(crate) mod walk;
 use crate::Shot;
 
 pub(crate) trait Command {
-    fn execute(subcmd: Shot) -> Result<String>;
+    fn execute(subcmd: Shot) -> Result<()>;
 }

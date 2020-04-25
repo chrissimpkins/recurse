@@ -4,9 +4,9 @@ use walkdir::{IntoIter, WalkDir};
 
 pub(crate) fn walk<P>(
     path: P,
-    mindepth: Option<usize>,
-    maxdepth: Option<usize>,
-    symlinks: bool,
+    mindepth: &Option<usize>,
+    maxdepth: &Option<usize>,
+    symlinks: &bool,
 ) -> IntoIter
 where
     P: AsRef<Path>,
@@ -24,7 +24,7 @@ where
     }
     // Follow symbolic links and include in returned paths
     // default: false
-    if symlinks {
+    if *symlinks {
         wd = wd.follow_links(true);
     }
     wd.into_iter()
@@ -37,8 +37,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_dir_default_depth() {
-        let mut dirpaths = walk("./tests/testfiles/io/stablepaths", None, None, false);
-        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", None, None, false);
+        let mut dirpaths = walk("./tests/testfiles/io/stablepaths", &None, &None, &false);
+        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", &None, &None, &false);
         let expected_list = [
             Path::new("./tests/testfiles/io/stablepaths"),
             Path::new("./tests/testfiles/io/stablepaths/test"),
@@ -65,15 +65,15 @@ mod tests {
     fn test_walk_with_file_default_depth() {
         let mut filepaths = walk(
             "./tests/testfiles/io/stablepaths/README.md",
-            None,
-            None,
-            false,
+            &None,
+            &None,
+            &false,
         );
         let filepaths_len_check = walk(
             "./tests/testfiles/io/stablepaths/README.md",
-            None,
-            None,
-            false,
+            &None,
+            &None,
+            &false,
         );
 
         assert_eq!(
@@ -97,7 +97,7 @@ mod tests {
         ];
         // filter_map to filter out directories that process does not have permission
         // to access
-        let mut file_entries = walk("./tests/testfiles/io/stablepaths", None, None, false)
+        let mut file_entries = walk("./tests/testfiles/io/stablepaths", &None, &None, &false)
             .filter_map(|f| f.ok())
             .filter_map(|f| {
                 if f.path().is_file() {
@@ -114,8 +114,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_dir_set_max_depth() {
-        let mut dirpaths = walk("./tests/testfiles/io/depthtests", None, Some(1), false);
-        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", None, Some(1), false);
+        let mut dirpaths = walk("./tests/testfiles/io/depthtests", &None, &Some(1), &false);
+        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", &None, &Some(1), &false);
         let expected_list = [
             Path::new("./tests/testfiles/io/depthtests"),
             Path::new("./tests/testfiles/io/depthtests/test.txt"),
@@ -133,8 +133,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_dir_set_min_depth() {
-        let mut dirpaths = walk("./tests/testfiles/io/depthtests", Some(3), None, false);
-        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", Some(3), None, false);
+        let mut dirpaths = walk("./tests/testfiles/io/depthtests", &Some(3), &None, &false);
+        let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", &Some(3), &None, &false);
         let expected_list = [Path::new(
             "./tests/testfiles/io/depthtests/depth2/depth3/test3.txt",
         )];
@@ -148,8 +148,8 @@ mod tests {
 
     #[test]
     fn test_walk_with_dir_default_depth_and_follow_symlinks() {
-        let mut dirpaths = walk("./tests/testfiles/io/stablepaths", None, None, true);
-        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", None, None, true);
+        let mut dirpaths = walk("./tests/testfiles/io/stablepaths", &None, &None, &true);
+        let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", &None, &None, &true);
         let expected_list = [
             Path::new("./tests/testfiles/io/stablepaths"),
             Path::new("./tests/testfiles/io/stablepaths/test"),

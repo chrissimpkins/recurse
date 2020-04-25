@@ -110,7 +110,7 @@ enum Shot {
 }
 
 /// `shot` executable execution entry point
-pub fn run() -> Result<String> {
+pub fn run() -> Result<()> {
     let config = Config::new(Shot::from_args());
     match &config.subcmd {
         Shot::Contains {
