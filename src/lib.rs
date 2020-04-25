@@ -16,7 +16,7 @@ use config::Config;
 #[derive(StructOpt, Debug)]
 #[structopt(about = "A shotgun for text files")]
 enum Shot {
-    #[structopt(about = "Find text in files")]
+    #[structopt(about = "Find strings in files")]
     Find {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
@@ -29,7 +29,7 @@ enum Shot {
         #[structopt(parse(from_os_str), help = "In file path")]
         inpath: PathBuf,
     },
-    #[structopt(about = "Replace text in files")]
+    #[structopt(about = "Replace strings in files")]
     Replace {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
