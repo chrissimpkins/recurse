@@ -7,6 +7,7 @@ use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
 use crate::Shot;
 
+#[derive(Debug)]
 pub(crate) struct WalkCommand {}
 
 impl Command for WalkCommand {
