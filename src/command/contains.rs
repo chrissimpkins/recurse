@@ -5,7 +5,6 @@ use std::path::Path;
 use anyhow::{anyhow, Result};
 use regex::Regex;
 
-// use crate::command::walk::WalkCommand;
 use crate::command::Command;
 use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
@@ -46,7 +45,7 @@ impl Command for ContainsCommand {
             }
             Ok(())
         } else {
-            Err(anyhow!("failure to parse walk subcommand."))
+            Err(anyhow!("failure to parse contains subcommand."))
         }
     }
 }
