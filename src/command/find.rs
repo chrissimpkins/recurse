@@ -3,6 +3,7 @@ use std::io::ErrorKind;
 use std::path::Path;
 
 use anyhow::{anyhow, Result};
+use colored::*;
 use regex::Regex;
 
 use crate::command::Command;
@@ -50,9 +51,6 @@ impl Command for FindCommand {
 }
 
 impl FindCommand {
-    //TODO: need a BufReader.lines().enumerate() iterator for line by line testing across each file
-    //TODO: short circuit the line by line read with a check for file-wide match, not necessary to search through
-    // each line if file does not contain the string (Is this faster than just doing the line by line?)
     pub(crate) fn print_filepath_regex_matches(filepath: &Path, regex: &Regex) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
@@ -65,12 +63,14 @@ impl FindCommand {
                         line_number += 1;
                         for mat in regex.find_iter(line) {
                             println!(
-                                "{}: {}:{}-{} ['{}']",
+                                "{} {}:{}-{} {} {} {}",
                                 &filepath.display(),
-                                &line_number,
-                                &mat.start(),
-                                &mat.end(),
-                                &mat.as_str(),
+                                &line_number.to_string().green(),
+                                &mat.start().to_string().green(),
+                                &mat.end().to_string().green(),
+                                "[".dimmed(),
+                                &mat.as_str().red().bold(),
+                                "]".dimmed(),
                             );
                         }
                     }
