@@ -1,12 +1,52 @@
-use anyhow::Result;
+use std::fs::read_to_string;
+use std::io::ErrorKind;
+use std::path::Path;
+
+use anyhow::{anyhow, Result};
+use colored::*;
+use regex::Regex;
 
 use crate::command::Command;
+use crate::ops::io::walk;
+use crate::ops::path::{path_has_extension, path_is_hidden};
 use crate::Shot;
 
 pub(crate) struct ReplaceCommand {}
 
 impl Command for ReplaceCommand {
     fn execute(subcmd: Shot) -> Result<()> {
-        Ok(())
+        if let Shot::Replace {
+            extension,
+            hidden,
+            mindepth,
+            maxdepth,
+            symlinks,
+            find,
+            inpath,
+            replace,
+        } = subcmd
+        {
+            let has_extension_filter = extension.is_some();
+            let regex = Regex::new(&find)?;
+            for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
+                if entry.metadata().unwrap().is_file() {
+                    let filepath = entry.path();
+                    if !hidden && path_is_hidden(filepath) {
+                        // if file is in a hidden path, skip it
+                        continue;
+                    } else if has_extension_filter {
+                        // if user requested extension filter, filter on it
+                        if path_has_extension(filepath, extension.as_ref().unwrap()) {
+                            // TODO:
+                        }
+                    } else {
+                        // TODO:
+                    }
+                }
+            }
+            Ok(())
+        } else {
+            Err(anyhow!("failure to parse find subcommand."))
+        }
     }
 }

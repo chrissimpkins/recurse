@@ -86,6 +86,25 @@ enum Shot {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
         extension: Option<String>,
+
+        /// Include hidden files under dot directory or dot file paths
+        /// The default is to not include these files
+        #[structopt(long = "hidden", help = "Include hidden files")]
+        hidden: bool,
+
+        /// Define the minimum depth of the directory traversal
+        #[structopt(long = "mindepth", help = "Minimum directory depth")]
+        mindepth: Option<usize>,
+
+        /// Define the maximum depth of the directory traversal
+        #[structopt(long = "maxdepth", help = "Maximum directory depth")]
+        maxdepth: Option<usize>,
+
+        /// Follow symbolic links
+        /// Default is to not follow symbolic links
+        #[structopt(long = "symlinks", help = "Follow symbolic links")]
+        symlinks: bool,
+
         /// Find string
         #[structopt(help = "Find string")]
         find: String,
@@ -152,9 +171,13 @@ pub fn run() -> Result<()> {
         } => return FindCommand::execute(config.subcmd),
         Shot::Replace {
             extension: _,
+            hidden: _,
+            mindepth: _,
+            maxdepth: _,
+            symlinks: _,
+            inpath: _,
             find: _,
             replace: _,
-            inpath: _,
         } => return ReplaceCommand::execute(config.subcmd),
         Shot::Walk {
             extension: _,
