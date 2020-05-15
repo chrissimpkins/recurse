@@ -42,7 +42,7 @@ enum Shot {
         symlinks: bool,
 
         /// Find string
-        #[structopt(help = "Find string")]
+        #[structopt(help = "Find regular expression")]
         find: String,
 
         /// Input file
@@ -74,7 +74,7 @@ enum Shot {
         symlinks: bool,
 
         /// Find string
-        #[structopt(help = "Find string")]
+        #[structopt(help = "Find regular expression")]
         find: String,
 
         /// Input file
@@ -106,11 +106,11 @@ enum Shot {
         symlinks: bool,
 
         /// Find string
-        #[structopt(help = "Find string")]
+        #[structopt(short = "f", long = "find", help = "Find regular expression")]
         find: String,
 
         /// Replace string
-        #[structopt(help = "Replace string")]
+        #[structopt(short = "r", long = "replace", help = "Replace string")]
         replace: String,
 
         /// Input file
