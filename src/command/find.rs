@@ -26,7 +26,7 @@ impl Command for FindCommand {
         } = subcmd
         {
             let has_extension_filter = extension.is_some();
-            let regex = Regex::new(&find)?;
+            let re = Regex::new(&find)?;
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
                 if entry.metadata().unwrap().is_file() {
                     let filepath = entry.path();
@@ -36,10 +36,10 @@ impl Command for FindCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            FindCommand::print_filepath_regex_matches(&filepath, &regex)?;
+                            FindCommand::print_filepath_regex_matches(&filepath, &re)?;
                         }
                     } else {
-                        FindCommand::print_filepath_regex_matches(&filepath, &regex)?;
+                        FindCommand::print_filepath_regex_matches(&filepath, &re)?;
                     }
                 }
             }
@@ -51,17 +51,17 @@ impl Command for FindCommand {
 }
 
 impl FindCommand {
-    pub(crate) fn print_filepath_regex_matches(filepath: &Path, regex: &Regex) -> Result<()> {
+    pub(crate) fn print_filepath_regex_matches(filepath: &Path, re: &Regex) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
                 // short circuit the individual line checks if overall match does not
                 // indicate the presence of a match
-                if regex.is_match(&filestr) {
+                if re.is_match(&filestr) {
                     // iterate through lines and print matches
                     let mut line_number = 0;
                     for line in filestr.lines() {
                         line_number += 1;
-                        for mat in regex.find_iter(line) {
+                        for mat in re.find_iter(line) {
                             println!(
                                 "{} {}:{}-{} {} {} {}",
                                 &filepath.display(),
