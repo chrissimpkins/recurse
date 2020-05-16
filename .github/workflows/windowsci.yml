@@ -1,0 +1,23 @@
+on: [push, pull_request]
+
+name: Windows CI
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        toolchain: [stable, beta, nightly]
+    name: Windows CI
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install latest stable toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+
+      - name: Run cargo test
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
