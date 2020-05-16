@@ -1,4 +1,5 @@
 shot
 
-[![Build Status](https://travis-ci.com/chrissimpkins/shot.svg?branch=master)](https://travis-ci.com/chrissimpkins/shot)
-[![Build status](https://ci.appveyor.com/api/projects/status/paf0dx7oorelohlx/branch/master?svg=true)](https://ci.appveyor.com/project/chrissimpkins/shot/branch/master)
+[![GNU/Linux CI](https://github.com/chrissimpkins/shot/workflows/GNU/Linux%20CI/badge.svg)](https://github.com/chrissimpkins/shot/actions?query=workflow%3A%22GNU%2FLinux+CI%22)
+[![macOS CI](https://github.com/chrissimpkins/shot/workflows/macOS%20CI/badge.svg)](https://github.com/chrissimpkins/shot/actions?query=workflow%3A%22macOS+CI%22)
+[![Windows CI](https://github.com/chrissimpkins/shot/workflows/Windows%20CI/badge.svg)](https://github.com/chrissimpkins/shot/actions?query=workflow%3A%22Windows+CI%22)
