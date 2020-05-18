@@ -25,13 +25,15 @@ impl Command for ReplaceCommand {
             replace,
         } = subcmd
         {
+            // TODO: add inplace option for in place file overwrites
+            // Validation for unacceptable paths
+            // TODO: refactor to a new validation function
             if inpath.to_string_lossy() == "/" || inpath.to_string_lossy() == r"\" {
                 return Err(anyhow!(
                     "shot does not support directory walk replacements originating on the file path '{}'",
                     inpath.display()
                 ));
             }
-            // TODO: add guard against running this on very broad root level directory paths
             let has_extension_filter = extension.is_some();
             let re = Regex::new(&find)?;
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
@@ -52,7 +54,7 @@ impl Command for ReplaceCommand {
             }
             Ok(())
         } else {
-            Err(anyhow!("failure to parse find subcommand."))
+            Err(anyhow!("failure to parse replace subcommand."))
         }
     }
 }
