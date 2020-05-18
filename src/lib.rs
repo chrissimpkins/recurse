@@ -92,6 +92,10 @@ enum Shot {
         #[structopt(long = "hidden", help = "Include hidden files")]
         hidden: bool,
 
+        /// The default is to not include these files
+        #[structopt(short = "i", long = "inplace", help = "Write files in place")]
+        inplace: bool,
+
         /// Define the minimum depth of the directory traversal
         #[structopt(long = "mindepth", help = "Minimum directory depth")]
         mindepth: Option<usize>,
@@ -172,6 +176,7 @@ pub fn run() -> Result<()> {
         Shot::Replace {
             extension: _,
             hidden: _,
+            inplace: _,
             mindepth: _,
             maxdepth: _,
             symlinks: _,
