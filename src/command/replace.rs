@@ -1,6 +1,6 @@
 use std::fs::{read_to_string, write};
 use std::io::ErrorKind;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
 use regex::Regex;
@@ -17,6 +17,7 @@ impl Command for ReplaceCommand {
         if let Shot::Replace {
             extension,
             hidden,
+            inplace,
             mindepth,
             maxdepth,
             symlinks,
@@ -25,12 +26,9 @@ impl Command for ReplaceCommand {
             replace,
         } = subcmd
         {
-            // TODO: add inplace option for in place file overwrites
-            // Validation for unacceptable paths
-            // TODO: refactor to a new validation function
-            if inpath.to_string_lossy() == "/" || inpath.to_string_lossy() == r"\" {
+            if is_root_filepath(&inpath) {
                 return Err(anyhow!(
-                    "shot does not support directory walk replacements originating on the file path '{}'",
+                    "shot does not support replacements originating on the file path '{}'",
                     inpath.display()
                 ));
             }
@@ -45,10 +43,10 @@ impl Command for ReplaceCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            ReplaceCommand::regex_replace(&filepath, &re, &replace)?;
-                        }
+                            ReplaceCommand::regex_replace(&filepath, &re, &replace, &inplace)?;
+                        } // otherwise skip
                     } else {
-                        ReplaceCommand::regex_replace(&filepath, &re, &replace)?;
+                        ReplaceCommand::regex_replace(&filepath, &re, &replace, &inplace)?;
                     }
                 }
             }
@@ -60,13 +58,23 @@ impl Command for ReplaceCommand {
 }
 
 impl ReplaceCommand {
-    pub(crate) fn regex_replace(filepath: &Path, re: &Regex, replace: &str) -> Result<()> {
+    pub(crate) fn regex_replace(
+        filepath: &Path,
+        re: &Regex,
+        replace: &str,
+        inplace: &bool,
+    ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
                 // bail if no matches so that we don't
                 // write files that are not changed
                 if re.is_match(&filestr) {
                     let post_replace_string = re.replace_all(&filestr, replace);
+                    if *inplace == true {
+                        // TODO: overwrite file
+                    } else {
+                        // TODO: create a second file path for the new file
+                    }
                     println!("{}:\n{}", filepath.display(), post_replace_string);
                 }
             }
@@ -80,5 +88,37 @@ impl ReplaceCommand {
             },
         }
         Ok(())
+    }
+}
+
+fn is_root_filepath(inpath: &PathBuf) -> bool {
+    let invalid_list = ["/", r"\"];
+    let inpath_needle = inpath.to_string_lossy();
+    invalid_list.contains(&inpath_needle.as_ref())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ======================================
+    // is_root_filepath tests
+    // ======================================
+    #[test]
+    fn test_is_root_filepath_with_unix_root() {
+        let testpath = PathBuf::from("/");
+        assert!(is_root_filepath(&testpath));
+    }
+
+    #[test]
+    fn test_is_root_filepath_with_win_root() {
+        let testpath = PathBuf::from(r"\");
+        assert!(is_root_filepath(&testpath));
+    }
+
+    #[test]
+    fn test_is_root_filepath_without_root_fp() {
+        let testpath = PathBuf::from("test/path/bogus");
+        assert_eq!(is_root_filepath(&testpath), false);
     }
 }
