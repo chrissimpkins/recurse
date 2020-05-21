@@ -203,6 +203,12 @@ mod tests {
     }
 
     #[test]
+    fn test_has_secondary_extension_with_secondary_extension_alt1() {
+        let testpath = PathBuf::from("test/path/bogus.2");
+        assert!(has_secondary_extension(&testpath));
+    }
+
+    #[test]
     fn test_has_secondary_extension_without_secondary_extension() {
         let testpath = PathBuf::from("test/path/bogus.txt");
         assert_eq!(has_secondary_extension(&testpath), false);
