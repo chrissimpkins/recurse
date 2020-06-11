@@ -11,7 +11,7 @@ use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
 use crate::Shot;
 
-const SECONDARY_FILEPATH_EXTENSION: &str = "2";
+const BACKUP_FILEPATH_EXTENSION: &str = "bu";
 
 pub(crate) struct ReplaceCommand {}
 
@@ -20,7 +20,7 @@ impl Command for ReplaceCommand {
         if let Shot::Replace {
             extension,
             hidden,
-            inplace,
+            nobu,
             mindepth,
             maxdepth,
             symlinks,
@@ -42,14 +42,10 @@ impl Command for ReplaceCommand {
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
                 if entry.metadata().unwrap().is_file() {
                     let filepath = entry.path();
-                    if has_secondary_extension(&filepath) {
-                        // If file has the secondary extension that is used by
+                    if has_backup_extension(&filepath) {
+                        // If file has the backup extension that is used by
                         // this application, do not perform string replacement
-                        // in that file. Use the original and overwrite the
-                        // secondary file with previous replacements.
-                        // Removal of this check will lead to additional secondary
-                        // files with new extensions based on the last secondary
-                        // file path in sequence.  This is not desired behavior.
+                        // in that file.
                         continue;
                     } else if !hidden && path_is_hidden(filepath) {
                         // if file is in a hidden path, skip it
@@ -57,10 +53,10 @@ impl Command for ReplaceCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            ReplaceCommand::regex_replace(&filepath, &re, &replace, &inplace)?;
+                            ReplaceCommand::regex_replace(&filepath, &re, &replace, &nobu)?;
                         } // otherwise skip
                     } else {
-                        ReplaceCommand::regex_replace(&filepath, &re, &replace, &inplace)?;
+                        ReplaceCommand::regex_replace(&filepath, &re, &replace, &nobu)?;
                     }
                 }
             }
@@ -76,7 +72,7 @@ impl ReplaceCommand {
         filepath: &Path,
         re: &Regex,
         replace: &str,
-        inplace: &bool,
+        nobu: &bool,
     ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
@@ -84,42 +80,29 @@ impl ReplaceCommand {
                 // write files that are not changed
                 if re.is_match(&filestr) {
                     let post_replace_string = re.replace_all(&filestr, replace);
-                    if *inplace == true {
-                        // Write files in place when explicitly requested by user
-                        // ========================================================
-                        //
-                        // DANGER ZONE
-                        //
-                        // ========================================================
-                        // With directory walks this is a potentially very
-                        // dangerous code block that has the potential to cause
-                        // widespread file system mayhem.  User *must* explicitly
-                        // request that they want in place file writes to use this
-                        // functionality.
-                        // With great power comes great responsibility...
-                        let file = OpenOptions::new().write(true).create(true).open(filepath)?;
-                        let mut buffer = BufWriter::new(file);
 
-                        buffer.write_all(post_replace_string.as_bytes())?;
-                        buffer.flush()?;
-                        println!("{} updated", filepath.display());
-                    } else {
-                        // Create a secondary file path by default
-                        let secondary_filepath = get_secondary_filepath(filepath);
-                        let file = OpenOptions::new()
+                    if *nobu == false {
+                        // Write backup of original file
+                        // This is the default behavior when user
+                        // does not use an explicit flag on the
+                        // command line
+                        let backup_file = OpenOptions::new()
                             .write(true)
                             .create(true)
-                            .open(&secondary_filepath)?;
-                        let mut buffer = BufWriter::new(file);
-
-                        buffer.write_all(post_replace_string.as_bytes())?;
-                        buffer.flush()?;
-                        println!(
-                            "{} updated with write to {}",
-                            filepath.display(),
-                            secondary_filepath.display()
-                        );
+                            .open(get_backup_filepath(filepath))?;
+                        let mut backup_buffer = BufWriter::new(backup_file);
+                        backup_buffer.write_all(&filestr.as_bytes())?;
+                        backup_buffer.flush()?;
                     }
+
+                    // write replacement string inplace
+                    let replace_file =
+                        OpenOptions::new().write(true).create(true).open(filepath)?;
+                    let mut buffer = BufWriter::new(replace_file);
+
+                    buffer.write_all(post_replace_string.as_bytes())?;
+                    buffer.flush()?;
+                    println!("{} updated", filepath.display());
                 }
             }
             Err(error) => match error.kind() {
@@ -135,21 +118,21 @@ impl ReplaceCommand {
     }
 }
 
-fn get_secondary_filepath(inpath: &Path) -> PathBuf {
+fn get_backup_filepath(inpath: &Path) -> PathBuf {
     match inpath.extension() {
         Some(pre_ext) => {
-            let post_ext = pre_ext.to_string_lossy() + "." + SECONDARY_FILEPATH_EXTENSION;
+            let post_ext = pre_ext.to_string_lossy() + "." + BACKUP_FILEPATH_EXTENSION;
             return inpath.with_extension(post_ext.to_string());
         }
         None => {
-            return inpath.with_extension(SECONDARY_FILEPATH_EXTENSION);
+            return inpath.with_extension(BACKUP_FILEPATH_EXTENSION);
         }
     }
 }
 
-fn has_secondary_extension(inpath: &Path) -> bool {
+fn has_backup_extension(inpath: &Path) -> bool {
     match inpath.extension() {
-        Some(ext) => return ext.to_string_lossy() == SECONDARY_FILEPATH_EXTENSION,
+        Some(ext) => return ext.to_string_lossy() == BACKUP_FILEPATH_EXTENSION,
         None => return false,
     }
 }
@@ -171,8 +154,8 @@ mod tests {
     fn test_get_secondary_filepath_with_txt_extension() {
         let testpath = PathBuf::from("test/path/bogus.txt");
         assert_eq!(
-            get_secondary_filepath(&testpath),
-            PathBuf::from("test/path/bogus.txt.2")
+            get_backup_filepath(&testpath),
+            PathBuf::from("test/path/bogus.txt.bu")
         );
     }
 
@@ -180,8 +163,8 @@ mod tests {
     fn test_get_secondary_filepath_with_2_extension() {
         let testpath = PathBuf::from("test/path/bogus.2");
         assert_eq!(
-            get_secondary_filepath(&testpath),
-            PathBuf::from("test/path/bogus.2.2")
+            get_backup_filepath(&testpath),
+            PathBuf::from("test/path/bogus.2.bu")
         );
     }
 
@@ -189,8 +172,8 @@ mod tests {
     fn test_get_secondary_filepath_without_extension() {
         let testpath = PathBuf::from("test/path/bogus");
         assert_eq!(
-            get_secondary_filepath(&testpath),
-            PathBuf::from("test/path/bogus.2")
+            get_backup_filepath(&testpath),
+            PathBuf::from("test/path/bogus.bu")
         );
     }
     // ======================================
@@ -198,20 +181,20 @@ mod tests {
     // ======================================
     #[test]
     fn test_has_secondary_extension_with_secondary_extension() {
-        let testpath = PathBuf::from("test/path/bogus.txt.2");
-        assert!(has_secondary_extension(&testpath));
+        let testpath = PathBuf::from("test/path/bogus.txt.bu");
+        assert!(has_backup_extension(&testpath));
     }
 
     #[test]
     fn test_has_secondary_extension_with_secondary_extension_alt1() {
-        let testpath = PathBuf::from("test/path/bogus.2");
-        assert!(has_secondary_extension(&testpath));
+        let testpath = PathBuf::from("test/path/bogus.bu");
+        assert!(has_backup_extension(&testpath));
     }
 
     #[test]
     fn test_has_secondary_extension_without_secondary_extension() {
         let testpath = PathBuf::from("test/path/bogus.txt");
-        assert_eq!(has_secondary_extension(&testpath), false);
+        assert_eq!(has_backup_extension(&testpath), false);
     }
 
     // ======================================
