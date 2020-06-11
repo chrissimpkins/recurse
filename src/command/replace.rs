@@ -89,6 +89,7 @@ impl ReplaceCommand {
                         let backup_file = OpenOptions::new()
                             .write(true)
                             .create(true)
+                            .truncate(true)
                             .open(get_backup_filepath(filepath))?;
                         let mut backup_buffer = BufWriter::new(backup_file);
                         backup_buffer.write_all(&filestr.as_bytes())?;
@@ -96,8 +97,11 @@ impl ReplaceCommand {
                     }
 
                     // write replacement string inplace
-                    let replace_file =
-                        OpenOptions::new().write(true).create(true).open(filepath)?;
+                    let replace_file = OpenOptions::new()
+                        .write(true)
+                        .create(true)
+                        .truncate(true)
+                        .open(filepath)?;
                     let mut buffer = BufWriter::new(replace_file);
 
                     buffer.write_all(post_replace_string.as_bytes())?;
