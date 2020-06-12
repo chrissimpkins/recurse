@@ -155,42 +155,9 @@ enum Shot {
 pub fn run() -> Result<()> {
     let config = Config::new(Shot::from_args());
     match &config.subcmd {
-        Shot::Contains {
-            extension: _,
-            hidden: _,
-            mindepth: _,
-            maxdepth: _,
-            symlinks: _,
-            inpath: _,
-            find: _,
-        } => return ContainsCommand::execute(config.subcmd),
-        Shot::Find {
-            extension: _,
-            hidden: _,
-            mindepth: _,
-            maxdepth: _,
-            symlinks: _,
-            inpath: _,
-            find: _,
-        } => return FindCommand::execute(config.subcmd),
-        Shot::Replace {
-            extension: _,
-            hidden: _,
-            nobu: _,
-            mindepth: _,
-            maxdepth: _,
-            symlinks: _,
-            inpath: _,
-            find: _,
-            replace: _,
-        } => return ReplaceCommand::execute(config.subcmd),
-        Shot::Walk {
-            extension: _,
-            hidden: _,
-            inpath: _,
-            mindepth: _,
-            maxdepth: _,
-            symlinks: _,
-        } => return WalkCommand::execute(config.subcmd),
+        Shot::Contains { .. } => return ContainsCommand::execute(config.subcmd),
+        Shot::Find { .. } => return FindCommand::execute(config.subcmd),
+        Shot::Replace { .. } => return ReplaceCommand::execute(config.subcmd),
+        Shot::Walk { .. } => return WalkCommand::execute(config.subcmd),
     }
 }
