@@ -17,7 +17,7 @@ use config::Config;
 #[derive(StructOpt, Debug)]
 #[structopt(about = "Recursive directory traversal file management tool")]
 enum Recurse {
-    #[structopt(about = "Test for string in files")]
+    #[structopt(about = "Test for string in text files")]
     Contains {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
@@ -49,7 +49,7 @@ enum Recurse {
         #[structopt(parse(from_os_str), help = "In file path")]
         inpath: PathBuf,
     },
-    #[structopt(about = "Find strings in files")]
+    #[structopt(about = "Find strings in text files")]
     Find {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
@@ -81,7 +81,7 @@ enum Recurse {
         #[structopt(parse(from_os_str), help = "In file path")]
         inpath: PathBuf,
     },
-    #[structopt(about = "Replace strings in files")]
+    #[structopt(about = "Replace strings in text files")]
     Replace {
         /// File extension filter
         #[structopt(short = "e", long = "ext", help = "File extension filter")]
