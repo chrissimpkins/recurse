@@ -1,12 +1,12 @@
-use crate::Shot;
+use crate::Recurse;
 
 #[derive(Debug)]
 pub(crate) struct Config {
-    pub(crate) subcmd: Shot,
+    pub(crate) subcmd: Recurse,
 }
 
 impl Config {
-    pub(crate) fn new(opt: Shot) -> Self {
+    pub(crate) fn new(opt: Recurse) -> Self {
         Self { subcmd: opt }
     }
 }

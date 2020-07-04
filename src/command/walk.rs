@@ -3,13 +3,13 @@ use anyhow::{anyhow, Result};
 use crate::command::Command;
 use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
-use crate::Shot;
+use crate::Recurse;
 
 pub(crate) struct WalkCommand {}
 
 impl Command for WalkCommand {
-    fn execute(subcmd: Shot) -> Result<()> {
-        if let Shot::Walk {
+    fn execute(subcmd: Recurse) -> Result<()> {
+        if let Recurse::Walk {
             extension,
             hidden,
             inpath,

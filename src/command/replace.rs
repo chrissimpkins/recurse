@@ -9,15 +9,15 @@ use regex::Regex;
 use crate::command::Command;
 use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
-use crate::Shot;
+use crate::Recurse;
 
 const BACKUP_FILEPATH_EXTENSION: &str = "bu";
 
 pub(crate) struct ReplaceCommand {}
 
 impl Command for ReplaceCommand {
-    fn execute(subcmd: Shot) -> Result<()> {
-        if let Shot::Replace {
+    fn execute(subcmd: Recurse) -> Result<()> {
+        if let Recurse::Replace {
             extension,
             hidden,
             nobu,

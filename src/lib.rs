@@ -16,7 +16,7 @@ use config::Config;
 /// The command line argument implementation
 #[derive(StructOpt, Debug)]
 #[structopt(about = "A shotgun for text files")]
-enum Shot {
+enum Recurse {
     #[structopt(about = "Test for string in files")]
     Contains {
         /// File extension filter
@@ -153,11 +153,11 @@ enum Shot {
 
 /// `shot` executable execution entry point
 pub fn run() -> Result<()> {
-    let config = Config::new(Shot::from_args());
+    let config = Config::new(Recurse::from_args());
     match &config.subcmd {
-        Shot::Contains { .. } => return ContainsCommand::execute(config.subcmd),
-        Shot::Find { .. } => return FindCommand::execute(config.subcmd),
-        Shot::Replace { .. } => return ReplaceCommand::execute(config.subcmd),
-        Shot::Walk { .. } => return WalkCommand::execute(config.subcmd),
+        Recurse::Contains { .. } => return ContainsCommand::execute(config.subcmd),
+        Recurse::Find { .. } => return FindCommand::execute(config.subcmd),
+        Recurse::Replace { .. } => return ReplaceCommand::execute(config.subcmd),
+        Recurse::Walk { .. } => return WalkCommand::execute(config.subcmd),
     }
 }

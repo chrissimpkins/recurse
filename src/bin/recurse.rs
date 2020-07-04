@@ -3,7 +3,7 @@ use std::process;
 
 use anyhow::Result;
 
-use shot::run;
+use recurse::run;
 
 fn main() -> Result<()> {
     match run() {

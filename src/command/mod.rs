@@ -5,8 +5,8 @@ pub(crate) mod find;
 pub(crate) mod replace;
 pub(crate) mod walk;
 
-use crate::Shot;
+use crate::Recurse;
 
 pub(crate) trait Command {
-    fn execute(subcmd: Shot) -> Result<()>;
+    fn execute(subcmd: Recurse) -> Result<()>;
 }

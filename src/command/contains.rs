@@ -8,13 +8,13 @@ use regex::Regex;
 use crate::command::Command;
 use crate::ops::io::walk;
 use crate::ops::path::{path_has_extension, path_is_hidden};
-use crate::Shot;
+use crate::Recurse;
 
 pub(crate) struct ContainsCommand {}
 
 impl Command for ContainsCommand {
-    fn execute(subcmd: Shot) -> Result<()> {
-        if let Shot::Contains {
+    fn execute(subcmd: Recurse) -> Result<()> {
+        if let Recurse::Contains {
             extension,
             hidden,
             mindepth,
