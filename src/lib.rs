@@ -15,7 +15,7 @@ use command::Command;
 use config::Config;
 /// The command line argument implementation
 #[derive(StructOpt, Debug)]
-#[structopt(about = "A shotgun for text files")]
+#[structopt(about = "Recursive directory traversal file management tool")]
 enum Recurse {
     #[structopt(about = "Test for string in files")]
     Contains {
@@ -151,7 +151,7 @@ enum Recurse {
     },
 }
 
-/// `shot` executable execution entry point
+/// `recurse` executable execution entry point
 pub fn run() -> Result<()> {
     let config = Config::new(Recurse::from_args());
     match &config.subcmd {

@@ -33,7 +33,7 @@ impl Command for ReplaceCommand {
             // when a path typo of `/` (Unix) or `\` (Win) is used on the command line
             if is_root_filepath(&inpath) {
                 return Err(anyhow!(
-                    "shot does not support replacements originating on the file path '{}'",
+                    "recurse does not support replacements originating on the file path '{}'",
                     inpath.display()
                 ));
             }
