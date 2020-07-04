@@ -1,4 +1,4 @@
-use std::fs::{read_to_string, write, OpenOptions};
+use std::fs::{read_to_string, OpenOptions};
 use std::io::prelude::*;
 use std::io::{BufWriter, ErrorKind};
 use std::path::{Path, PathBuf};
@@ -72,7 +72,7 @@ impl ReplaceCommand {
         filepath: &Path,
         re: &Regex,
         replace: &str,
-        nobu: &bool,
+        no_backup: &bool,
     ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
@@ -81,7 +81,7 @@ impl ReplaceCommand {
                 if re.is_match(&filestr) {
                     let post_replace_string = re.replace_all(&filestr, replace);
 
-                    if *nobu == false {
+                    if *no_backup == false {
                         // Write backup of original file
                         // This is the default behavior when user
                         // does not use an explicit flag on the
