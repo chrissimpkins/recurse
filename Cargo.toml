@@ -2,6 +2,7 @@
 name = "recurse"
 version = "0.0.1"
 authors = ["Chris Simpkins <git.simpkins@gmail.com>"]
+description = "Recursive directory traversal file management tool"
 edition = "2018"
 
 
