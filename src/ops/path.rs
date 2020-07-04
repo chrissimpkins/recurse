@@ -72,7 +72,7 @@ mod tests {
     fn test_get_absolute_filepath_good_path() {
         let testpath = get_absolute_filepath("./Cargo.toml");
         assert!(testpath.is_ok());
-        assert!(testpath.unwrap().ends_with("shot/Cargo.toml"));
+        assert!(testpath.unwrap().ends_with("recurse/Cargo.toml"));
     }
 
     #[test]
