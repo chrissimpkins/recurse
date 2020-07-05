@@ -42,11 +42,11 @@ enum Recurse {
         symlinks: bool,
 
         /// Find string
-        #[structopt(help = "Find regular expression")]
+        #[structopt(help = "Find regular expression pattern")]
         find: String,
 
         /// Input file
-        #[structopt(parse(from_os_str), help = "In file path")]
+        #[structopt(parse(from_os_str), help = "Traversal start path")]
         inpath: PathBuf,
     },
     #[structopt(about = "Find strings in text files")]
@@ -74,11 +74,11 @@ enum Recurse {
         symlinks: bool,
 
         /// Find string
-        #[structopt(help = "Find regular expression")]
+        #[structopt(help = "Find regular expression pattern")]
         find: String,
 
         /// Input file
-        #[structopt(parse(from_os_str), help = "In file path")]
+        #[structopt(parse(from_os_str), help = "Traversal start path")]
         inpath: PathBuf,
     },
     #[structopt(about = "Replace strings in text files")]
@@ -110,7 +110,7 @@ enum Recurse {
         symlinks: bool,
 
         /// Find string
-        #[structopt(short = "f", long = "find", help = "Find regular expression")]
+        #[structopt(short = "f", long = "find", help = "Find regular expression pattern")]
         find: String,
 
         /// Replace string
@@ -118,7 +118,7 @@ enum Recurse {
         replace: String,
 
         /// Input file
-        #[structopt(parse(from_os_str), help = "In file path")]
+        #[structopt(parse(from_os_str), help = "Traversal start path")]
         inpath: PathBuf,
     },
     #[structopt(about = "Walk the directory structure for files")]
@@ -133,7 +133,7 @@ enum Recurse {
         hidden: bool,
 
         /// Input file
-        #[structopt(parse(from_os_str), help = "In file path")]
+        #[structopt(parse(from_os_str), help = "Traversal start path")]
         inpath: PathBuf,
 
         /// Define the minimum depth of the directory traversal
