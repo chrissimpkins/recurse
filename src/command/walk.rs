@@ -11,6 +11,7 @@ impl Command for WalkCommand {
     fn execute(subcmd: Recurse) -> Result<()> {
         if let Recurse::Walk {
             extension,
+            dir_only,
             hidden,
             inpath,
             mindepth,
@@ -20,7 +21,9 @@ impl Command for WalkCommand {
         {
             let has_extension_filter = extension.is_some();
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
-                if entry.metadata().unwrap().is_file() {
+                let md = entry.metadata().unwrap();
+                if !dir_only && md.is_file() {
+                    // File path listings
                     let filepath = entry.path();
                     if !hidden && path_is_hidden(filepath) {
                         // if file is in a hidden path, skip it
@@ -32,6 +35,14 @@ impl Command for WalkCommand {
                         }
                     } else {
                         println!("{}", filepath.display());
+                    }
+                } else if dir_only && md.is_dir() {
+                    // Directory path listings
+                    let dirpath = entry.path();
+                    if !hidden && path_is_hidden(dirpath) {
+                        continue;
+                    } else {
+                        println!("{}", dirpath.display());
                     }
                 }
             }

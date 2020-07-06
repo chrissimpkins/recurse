@@ -121,15 +121,19 @@ enum Recurse {
         #[structopt(parse(from_os_str), help = "Traversal start path")]
         inpath: PathBuf,
     },
-    #[structopt(about = "Walk the directory structure for files")]
+    #[structopt(about = "Walk the directory structure for paths")]
     Walk {
         /// File extension filter
-        #[structopt(short = "e", long = "ext", help = "File extension filter")]
+        #[structopt(short = "e", long = "ext", help = "File path extension filter")]
         extension: Option<String>,
+
+        /// Directory only filter
+        #[structopt(short = "d", long = "dir", help = "Include directory paths only")]
+        dir_only: bool,
 
         /// Include hidden files under dot directory or dot file paths
         /// The default is to not include these files
-        #[structopt(short = "a", long = "all", help = "Include hidden files")]
+        #[structopt(short = "a", long = "all", help = "Include hidden paths")]
         hidden: bool,
 
         /// Input file
