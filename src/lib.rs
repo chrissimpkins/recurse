@@ -132,7 +132,7 @@ enum Recurse {
         dir_only: bool,
 
         /// Include hidden files under dot directory or dot file paths
-        /// The default is to not include these files
+        /// The default is to not include these paths
         #[structopt(short = "a", long = "all", help = "Include hidden paths")]
         hidden: bool,
 
