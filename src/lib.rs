@@ -25,7 +25,7 @@ enum Recurse {
 
         /// Include hidden files under dot directory or dot file paths
         /// The default is to not include these files
-        #[structopt(long = "hidden", help = "Include hidden files")]
+        #[structopt(short = "a", long = "all", help = "Include hidden files")]
         hidden: bool,
 
         /// Define the minimum depth of the directory traversal
@@ -57,7 +57,7 @@ enum Recurse {
 
         /// Include hidden files under dot directory or dot file paths
         /// The default is to not include these files
-        #[structopt(long = "hidden", help = "Include hidden files")]
+        #[structopt(short = "a", long = "all", help = "Include hidden files")]
         hidden: bool,
 
         /// Define the minimum depth of the directory traversal
@@ -89,7 +89,7 @@ enum Recurse {
 
         /// Include hidden files under dot directory or dot file paths
         /// The default is to not include these files
-        #[structopt(long = "hidden", help = "Include hidden files")]
+        #[structopt(short = "a", long = "all", help = "Include hidden files")]
         hidden: bool,
 
         /// Skip backup write of original file
@@ -129,7 +129,7 @@ enum Recurse {
 
         /// Include hidden files under dot directory or dot file paths
         /// The default is to not include these files
-        #[structopt(long = "hidden", help = "Include hidden files")]
+        #[structopt(short = "a", long = "all", help = "Include hidden files")]
         hidden: bool,
 
         /// Input file
