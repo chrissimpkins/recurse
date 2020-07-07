@@ -13,7 +13,8 @@ fn walk_inpath_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     cmd.arg("walk").arg("testfiles/doesnt/exist");
     cmd.assert()
         .failure()
-        .stderr(predicate::str::contains("no such file or directory"));
+        .stderr(predicate::str::contains("no such file or directory"))
+        .code(1);
 
     Ok(())
 }
