@@ -19,8 +19,9 @@ impl Command for WalkCommand {
             symlinks,
         } = subcmd
         {
-            let has_extension_filter = extension.is_some();
+            // ------------
             // Validations
+            // ------------
             // 1) inpath exists, if not bail with error
             if !inpath.exists() {
                 return Err(anyhow!(format!(
@@ -29,6 +30,9 @@ impl Command for WalkCommand {
                 )));
             }
 
+            let has_extension_filter = extension.is_some();
+
+            // Recursive walk of inpath with user-specified filters
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
                 let md = entry.metadata().unwrap();
                 if !dir_only && md.is_file() {
