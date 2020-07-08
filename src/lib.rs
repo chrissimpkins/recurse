@@ -159,9 +159,13 @@ enum Recurse {
 pub fn run() -> Result<()> {
     let config = Config::new(Recurse::from_args());
     match &config.subcmd {
-        Recurse::Contains { .. } => return ContainsCommand::execute(config.subcmd),
-        Recurse::Find { .. } => return FindCommand::execute(config.subcmd),
-        Recurse::Replace { .. } => return ReplaceCommand::execute(config.subcmd),
-        Recurse::Walk { .. } => return WalkCommand::execute(config.subcmd),
+        Recurse::Contains { .. } => {
+            return ContainsCommand::execute(config.subcmd, &mut std::io::stdout())
+        }
+        Recurse::Find { .. } => return FindCommand::execute(config.subcmd, &mut std::io::stdout()),
+        Recurse::Replace { .. } => {
+            return ReplaceCommand::execute(config.subcmd, &mut std::io::stdout())
+        }
+        Recurse::Walk { .. } => return WalkCommand::execute(config.subcmd, &mut std::io::stdout()),
     }
 }

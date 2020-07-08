@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use anyhow::{anyhow, Result};
 
 use crate::command::Command;
@@ -8,7 +10,7 @@ use crate::Recurse;
 pub(crate) struct WalkCommand {}
 
 impl Command for WalkCommand {
-    fn execute(subcmd: Recurse) -> Result<()> {
+    fn execute(subcmd: Recurse, mut writer: impl Write) -> Result<()> {
         if let Recurse::Walk {
             extension,
             dir_only,
@@ -44,10 +46,10 @@ impl Command for WalkCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            println!("{}", filepath.display());
+                            writeln!(writer, "{}", filepath.display())?;
                         }
                     } else {
-                        println!("{}", filepath.display());
+                        writeln!(writer, "{}", filepath.display())?;
                     }
                 } else if dir_only && md.is_dir() {
                     // Directory path listings
@@ -55,7 +57,7 @@ impl Command for WalkCommand {
                     if !hidden && path_is_hidden(dirpath) {
                         continue;
                     } else {
-                        println!("{}", dirpath.display());
+                        writeln!(writer, "{}", dirpath.display())?;
                     }
                 }
             }

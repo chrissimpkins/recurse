@@ -1,5 +1,5 @@
 use std::fs::read_to_string;
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Write};
 use std::path::Path;
 
 use anyhow::{anyhow, Result};
@@ -14,7 +14,7 @@ use crate::Recurse;
 pub(crate) struct FindCommand {}
 
 impl Command for FindCommand {
-    fn execute(subcmd: Recurse) -> Result<()> {
+    fn execute(subcmd: Recurse, mut writer: impl Write) -> Result<()> {
         if let Recurse::Find {
             extension,
             hidden,
@@ -36,10 +36,10 @@ impl Command for FindCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            FindCommand::print_filepath_regex_matches(&filepath, &re)?;
+                            FindCommand::print_filepath_regex_matches(&filepath, &re, &mut writer)?;
                         }
                     } else {
-                        FindCommand::print_filepath_regex_matches(&filepath, &re)?;
+                        FindCommand::print_filepath_regex_matches(&filepath, &re, &mut writer)?;
                     }
                 }
             }
@@ -51,7 +51,11 @@ impl Command for FindCommand {
 }
 
 impl FindCommand {
-    pub(crate) fn print_filepath_regex_matches(filepath: &Path, re: &Regex) -> Result<()> {
+    pub(crate) fn print_filepath_regex_matches(
+        filepath: &Path,
+        re: &Regex,
+        writer: &mut impl Write,
+    ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
                 // short circuit the individual line checks if overall match does not
@@ -62,7 +66,8 @@ impl FindCommand {
                     for line in filestr.lines() {
                         line_number += 1;
                         for mat in re.find_iter(line) {
-                            println!(
+                            writeln!(
+                                writer,
                                 "{} {}:{}-{} {} {} {}",
                                 &filepath.display(),
                                 &line_number.to_string().green(),
@@ -71,7 +76,7 @@ impl FindCommand {
                                 "[".dimmed(),
                                 &mat.as_str().red().bold(),
                                 "]".dimmed(),
-                            );
+                            )?;
                         }
                     }
                 }

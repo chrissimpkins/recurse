@@ -1,5 +1,5 @@
 use std::fs::read_to_string;
-use std::io::ErrorKind;
+use std::io::{ErrorKind, Write};
 use std::path::Path;
 
 use anyhow::{anyhow, Result};
@@ -13,7 +13,7 @@ use crate::Recurse;
 pub(crate) struct ContainsCommand {}
 
 impl Command for ContainsCommand {
-    fn execute(subcmd: Recurse) -> Result<()> {
+    fn execute(subcmd: Recurse, mut writer: impl Write) -> Result<()> {
         if let Recurse::Contains {
             extension,
             hidden,
@@ -35,10 +35,18 @@ impl Command for ContainsCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            ContainsCommand::print_filepath_regex_match(&filepath, &regex)?;
+                            ContainsCommand::print_filepath_regex_match(
+                                &filepath,
+                                &regex,
+                                &mut writer,
+                            )?;
                         }
                     } else {
-                        ContainsCommand::print_filepath_regex_match(&filepath, &regex)?;
+                        ContainsCommand::print_filepath_regex_match(
+                            &filepath,
+                            &regex,
+                            &mut writer,
+                        )?;
                     }
                 }
             }
@@ -50,11 +58,15 @@ impl Command for ContainsCommand {
 }
 
 impl ContainsCommand {
-    pub(crate) fn print_filepath_regex_match(filepath: &Path, regex: &Regex) -> Result<()> {
+    pub(crate) fn print_filepath_regex_match(
+        filepath: &Path,
+        regex: &Regex,
+        writer: &mut impl Write,
+    ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
                 if regex.is_match(&filestr) {
-                    println!("{}", &filepath.display());
+                    writeln!(writer, "{}", &filepath.display())?;
                 }
             }
             Err(error) => match error.kind() {

@@ -1,6 +1,5 @@
 use std::fs::{read_to_string, OpenOptions};
-use std::io::prelude::*;
-use std::io::{BufWriter, ErrorKind};
+use std::io::{BufWriter, ErrorKind, Write};
 use std::path::{Path, PathBuf};
 
 use anyhow::{anyhow, Result};
@@ -16,7 +15,7 @@ const BACKUP_FILEPATH_EXTENSION: &str = "bu";
 pub(crate) struct ReplaceCommand {}
 
 impl Command for ReplaceCommand {
-    fn execute(subcmd: Recurse) -> Result<()> {
+    fn execute(subcmd: Recurse, mut writer: impl Write) -> Result<()> {
         if let Recurse::Replace {
             extension,
             hidden,
@@ -53,10 +52,22 @@ impl Command for ReplaceCommand {
                     } else if has_extension_filter {
                         // if user requested extension filter, filter on it
                         if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            ReplaceCommand::regex_replace(&filepath, &re, &replace, &nobu)?;
+                            ReplaceCommand::regex_replace(
+                                &filepath,
+                                &re,
+                                &replace,
+                                &nobu,
+                                &mut writer,
+                            )?;
                         } // otherwise skip
                     } else {
-                        ReplaceCommand::regex_replace(&filepath, &re, &replace, &nobu)?;
+                        ReplaceCommand::regex_replace(
+                            &filepath,
+                            &re,
+                            &replace,
+                            &nobu,
+                            &mut writer,
+                        )?;
                     }
                 }
             }
@@ -73,6 +84,7 @@ impl ReplaceCommand {
         re: &Regex,
         replace: &str,
         no_backup: &bool,
+        writer: &mut impl Write,
     ) -> Result<()> {
         match read_to_string(&filepath) {
             Ok(filestr) => {
@@ -106,7 +118,7 @@ impl ReplaceCommand {
 
                     buffer.write_all(post_replace_string.as_bytes())?;
                     buffer.flush()?;
-                    println!("{} updated", filepath.display());
+                    writeln!(writer, "{} updated", filepath.display())?;
                 }
             }
             Err(error) => match error.kind() {
