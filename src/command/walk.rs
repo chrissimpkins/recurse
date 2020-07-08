@@ -113,9 +113,9 @@ mod tests {
         let output_vec: Vec<&str> = output_slice.split("\n").collect();
         // contains three expected file paths, including file path without extension
         if cfg!(windows) {
-            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\README.md"));
-            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\test"));
-            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\test.txt"));
+            assert!(output_slice.contains(r"tests\testfiles\io\stablepaths\README.md"));
+            assert!(output_slice.contains(r"tests\testfiles\io\stablepaths\test"));
+            assert!(output_slice.contains(r"tests\testfiles\io\stablepaths\test.txt"));
         } else {
             assert!(output_slice.contains("./tests/testfiles/io/stablepaths/README.md"));
             assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test"));
