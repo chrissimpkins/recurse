@@ -71,7 +71,7 @@ impl Command for WalkCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::{Path, PathBuf};
+    use std::path::PathBuf;
 
     #[test]
     fn test_walk_subcmd_invalid_inpath_validation() {
@@ -101,7 +101,7 @@ mod tests {
             extension: None,
             dir_only: false,
             hidden: false,
-            inpath: PathBuf::from("./tests/testfiles/io/stablepaths"),
+            inpath: PathBuf::from("tests/testfiles/io/stablepaths"),
             mindepth: None,
             maxdepth: None,
             symlinks: false,
@@ -112,22 +112,12 @@ mod tests {
         let output_slice = std::str::from_utf8(&output).unwrap();
         let output_vec: Vec<&str> = output_slice.split("\n").collect();
         // contains three expected file paths, including file path without extension
-        // the path gymnastics are to support win file path testing
-        assert!(output_slice.contains(
-            Path::new("./tests/testfiles/io/stablepaths/README.md")
-                .to_str()
-                .unwrap()
-        ));
-        assert!(output_slice.contains(
-            Path::new("./tests/testfiles/io/stablepaths/test")
-                .to_str()
-                .unwrap()
-        ));
-        assert!(output_slice.contains(
-            Path::new("./tests/testfiles/io/stablepaths/test.txt")
-                .to_str()
-                .unwrap()
-        ));
+        // the path gymnastics are to support cross-platform file path testing
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_stablepaths_README.md"));
+        assert!(output_string.contains("tests_testfiles_io_stablepaths_test"));
+        assert!(output_string.contains("tests_testfiles_io_stablepaths_test.txt"));
         // includes total of 4 lines
         assert!(output_vec.len() == 4);
         // last line is empty string after newline
