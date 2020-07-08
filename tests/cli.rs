@@ -7,7 +7,7 @@ use std::process::Command; // Run programs
 // =================================
 
 #[test]
-fn walk_inpath_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
+fn integration_walk_inpath_doesnt_exist() -> Result<(), Box<dyn std::error::Error>> {
     let mut cmd = Command::cargo_bin("recurse")?;
 
     cmd.arg("walk").arg("testfiles/doesnt/exist");
