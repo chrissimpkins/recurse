@@ -10,8 +10,6 @@ jobs:
     name: Windows CI
     runs-on: windows-latest
     steps:
-      - name: Set RUST_BACKTRACE env var
-        run: echo '::set-env name=RUST_BACKTRACE::1'
       - uses: actions/checkout@v2
       - name: Install latest stable toolchain
         uses: actions-rs/toolchain@v1

@@ -10,8 +10,6 @@ jobs:
     name: macOS CI
     runs-on: macos-latest
     steps:
-      - name: Set RUST_BACKTRACE env var
-        run: echo '::set-env name=RUST_BACKTRACE::1'
       - name: Cache cargo registry
         uses: actions/cache@v1
         with:
