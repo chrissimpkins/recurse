@@ -67,3 +67,55 @@ impl Command for WalkCommand {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_walk_subcmd_invalid_inpath_validation() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("no such file or directory"));
+    }
+
+    #[test]
+    fn test_walk_subcmd_dir_with_default_depth() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("./tests/testfiles/io/stablepaths"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        // contains three expected file paths, including path without extension
+        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/README.md"));
+        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test"));
+        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test.txt"));
+        // includes total of 4 lines
+        assert!(output_vec.len() == 4);
+        // last line is empty string after newline
+        assert!(output_vec[3] == "");
+    }
+}
