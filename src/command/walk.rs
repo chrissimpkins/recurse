@@ -86,6 +86,7 @@ mod tests {
         };
         let mut output = Vec::new();
         let res = WalkCommand::execute(rw, &mut output);
+        // invalid directory path should raise error
         assert!(res.is_err());
         assert!(res
             .unwrap_err()
@@ -95,6 +96,7 @@ mod tests {
 
     #[test]
     fn test_walk_subcmd_dir_with_default_depth() {
+        // TODO: need to support windows file paths
         let rw = Recurse::Walk {
             extension: None,
             dir_only: false,
@@ -109,10 +111,16 @@ mod tests {
         assert!(res.is_ok());
         let output_slice = std::str::from_utf8(&output).unwrap();
         let output_vec: Vec<&str> = output_slice.split("\n").collect();
-        // contains three expected file paths, including path without extension
-        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/README.md"));
-        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test"));
-        assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test.txt"));
+        // contains three expected file paths, including file path without extension
+        if cfg!(windows) {
+            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\README.md"));
+            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\test"));
+            assert!(output_slice.contains("tests\\testfiles\\io\\stablepaths\\test.txt"));
+        } else {
+            assert!(output_slice.contains("./tests/testfiles/io/stablepaths/README.md"));
+            assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test"));
+            assert!(output_slice.contains("./tests/testfiles/io/stablepaths/test.txt"));
+        }
         // includes total of 4 lines
         assert!(output_vec.len() == 4);
         // last line is empty string after newline
