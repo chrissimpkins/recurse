@@ -36,7 +36,7 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn test_walk_with_dir_default_depth() {
+    fn test_walk_func_with_dir_default_depth() {
         let mut dirpaths = walk("./tests/testfiles/io/stablepaths", &None, &None, &false);
         let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", &None, &None, &false);
         let expected_list = [
@@ -62,7 +62,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_file_default_depth() {
+    fn test_walk_func_with_file_default_depth() {
         let mut filepaths = walk(
             "./tests/testfiles/io/stablepaths/README.md",
             &None,
@@ -89,7 +89,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_filter_map_default_depth() {
+    fn test_walk_func_with_filter_map_default_depth() {
         let expected_list = [
             PathBuf::from("./tests/testfiles/io/stablepaths/test"),
             PathBuf::from("./tests/testfiles/io/stablepaths/README.md"),
@@ -113,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_dir_set_max_depth() {
+    fn test_walk_func_with_dir_set_max_depth() {
         let mut dirpaths = walk("./tests/testfiles/io/depthtests", &None, &Some(1), &false);
         let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", &None, &Some(1), &false);
         let expected_list = [
@@ -132,7 +132,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_dir_set_min_depth() {
+    fn test_walk_func_with_dir_set_min_depth() {
         let mut dirpaths = walk("./tests/testfiles/io/depthtests", &Some(3), &None, &false);
         let dirpaths_len_check = walk("./tests/testfiles/io/depthtests", &Some(3), &None, &false);
         let expected_list = [Path::new(
@@ -147,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    fn test_walk_with_dir_default_depth_and_follow_symlinks() {
+    fn test_walk_func_with_dir_default_depth_and_follow_symlinks() {
         let mut dirpaths = walk("./tests/testfiles/io/stablepaths", &None, &None, &true);
         let dirpaths_len_check = walk("./tests/testfiles/io/stablepaths", &None, &None, &true);
         let expected_list = [
