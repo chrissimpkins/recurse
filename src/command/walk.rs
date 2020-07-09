@@ -94,9 +94,11 @@ mod tests {
             .contains("no such file or directory"));
     }
 
+    // ============
+    // File testing
+    // ============
     #[test]
     fn test_walk_subcmd_dir_with_default_depth() {
-        // TODO: need to support windows file paths
         let rw = Recurse::Walk {
             extension: None,
             dir_only: false,
@@ -122,5 +124,319 @@ mod tests {
         assert!(output_vec.len() == 4);
         // last line is empty string after newline
         assert!(output_vec[3] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_dir_set_max_depth_1_level() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/depthtests"),
+            mindepth: None,
+            maxdepth: Some(1),
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_depthtests_test.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_dir_set_max_depth_2_levels() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/depthtests"),
+            mindepth: None,
+            maxdepth: Some(2),
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_depthtests_test.txt"));
+        assert!(output_string.contains("tests_testfiles_io_depthtests_depth2_test2.txt"));
+        // includes total of 3 lines
+        assert!(output_vec.len() == 3);
+        // last line is empty string after newline
+        assert!(output_vec[2] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_dir_set_min_depth_3_levels() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/depthtests"),
+            mindepth: Some(3),
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_depthtests_depth2_depth3_test3.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_extension_filter() {
+        let rw = Recurse::Walk {
+            extension: Some("txt".to_string()),
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/stablepaths"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        // contains three expected file paths, including file path without extension
+        // the path gymnastics are to support cross-platform file path testing
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_stablepaths_test.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_extension_filter_alt_ext_format() {
+        let rw = Recurse::Walk {
+            extension: Some(".txt".to_string()),
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/stablepaths"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        // contains three expected file paths, including file path without extension
+        // the path gymnastics are to support cross-platform file path testing
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_stablepaths_test.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_hidden_filepaths() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_.dotdir_.testfile"));
+        assert!(output_string.contains("tests_testfiles_.dotdir_testfile"));
+        assert!(output_string.contains("tests_testfiles_.dotdir_.testfile.txt"));
+        // includes total of 4 lines
+        assert!(output_vec.len() == 4);
+        // last line is empty string after newline
+        assert!(output_vec[3] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_hidden_filepaths_and_extension_filter() {
+        let rw = Recurse::Walk {
+            extension: Some("txt".to_string()),
+            dir_only: false,
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_.dotdir_.testfile.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_with_hidden_filepaths_and_extension_filter_alt_ext_format() {
+        let rw = Recurse::Walk {
+            extension: Some(".txt".to_string()),
+            dir_only: false,
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_.dotdir_.testfile.txt"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_without_hidden_filepaths() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        // includes total of 1 lines with no paths
+        assert!(output_vec.len() == 1);
+        // last line is empty string after newline
+        assert!(output_vec[0] == "");
+    }
+
+    // =================
+    // Directory testing
+    // =================
+    #[test]
+    fn test_walk_subcmd_filter_dirs_only_default_depth() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: true,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/io/depthtests"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_io_depthtests"));
+        assert!(output_string.contains("tests_testfiles_io_depthtests_depth2"));
+        assert!(output_string.contains("tests_testfiles_io_depthtests_depth2_depth3"));
+        // includes total of 4 lines
+        assert!(output_vec.len() == 4);
+        // last line is empty string after newline
+        assert!(output_vec[3] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_filter_dirs_only_hidden_switch_off() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: true,
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        // includes total of 1 lines
+        assert!(output_vec.len() == 1);
+        // last line is empty string after newline
+        assert!(output_vec[0] == "");
+    }
+
+    #[test]
+    fn test_walk_subcmd_filter_dirs_only_hidden_switch_on() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: true,
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/.dotdir"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_.dotdir"));
+        // includes total of 2 lines
+        assert!(output_vec.len() == 2);
+        // last line is empty string after newline
+        assert!(output_vec[1] == "");
     }
 }
