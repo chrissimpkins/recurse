@@ -94,6 +94,26 @@ mod tests {
             .contains("no such file or directory"));
     }
 
+    #[test]
+    fn test_walk_invalid_recurse_enum_arg() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: "test".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = WalkCommand::execute(rw, &mut output);
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("failure to parse walk subcommand"));
+    }
+
     // ============
     // File testing
     // ============
