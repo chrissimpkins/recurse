@@ -28,7 +28,7 @@ See the Usage section below for additional details.
 
 ### With `cargo` from crates.io
 
-Users who have installed Rust may use `cargo` to install the `recurse` executable from crates.io:
+Use `cargo` to install the `recurse` executable from crates.io:
 
 ```
 $ cargo install recurse
