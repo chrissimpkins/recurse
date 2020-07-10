@@ -16,7 +16,7 @@ Features are available through sub-commands of the `recurse` executable. Support
 
 - `recurse walk`: recursive directory traversal file listings
 
-The following subcommands are in development:
+The following sub-commands are in development:
 
 - [*coming in v0.2.0*] `recurse contains`: identify text file paths with text strings that match regular expression patterns
 - [*coming in v0.2.0*] `recurse find`: identify lines in text files that match regular expression patterns
