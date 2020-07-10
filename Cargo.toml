@@ -1,22 +1,21 @@
 [package]
-name = "recurse"
-version = "0.0.1"
-authors = ["Chris Simpkins <git.simpkins@gmail.com>"]
+authors     = ["Chris Simpkins <git.simpkins@gmail.com>"]
 description = "Recursive directory traversal file management tool"
-keywords = ["file","directory","path","search","recursive"]
-readme = "README.md"
-repository = "https://github.com/chrissimpkins/recurse"
-edition = "2018"
-license = "Apache-2.0"
-
+edition     = "2018"
+keywords    = ["file", "directory", "path", "search", "recursive"]
+license     = "Apache-2.0"
+name        = "recurse"
+readme      = "README.md"
+repository  = "https://github.com/chrissimpkins/recurse"
+version     = "0.1.0"
 
 [dependencies]
-walkdir = "2.3.1"
+anyhow    = "1.0"
 structopt = "0.3"
-anyhow = "1.0"
+walkdir   = "2.3.1"
 # rayon = "1.3"
-regex = "1.3"
 colored = "1.9"
+regex   = "1.3"
 
 [dev-dependencies]
 assert_cmd = "1.0.1"
