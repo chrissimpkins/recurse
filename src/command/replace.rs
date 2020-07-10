@@ -16,123 +16,125 @@ pub(crate) struct ReplaceCommand {}
 
 impl Command for ReplaceCommand {
     fn execute(subcmd: Recurse, mut writer: impl Write) -> Result<()> {
-        if let Recurse::Replace {
-            extension,
-            hidden,
-            nobu,
-            mindepth,
-            maxdepth,
-            symlinks,
-            find,
-            inpath,
-            replace,
-        } = subcmd
-        {
-            // Protect against accidental attempts to replace every path beginning at root
-            // when a path typo of `/` (Unix) or `\` (Win) is used on the command line
-            if is_root_filepath(&inpath) {
-                return Err(anyhow!(
-                    "recurse does not support replacements originating on the file path '{}'",
-                    inpath.display()
-                ));
-            }
-            let has_extension_filter = extension.is_some();
-            let re = Regex::new(&find)?;
-            for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
-                if entry.metadata().unwrap().is_file() {
-                    let filepath = entry.path();
-                    if has_backup_extension(&filepath) {
-                        // If file has the backup extension that is used by
-                        // this application, do not perform string replacement
-                        // in that file.
-                        continue;
-                    } else if !hidden && path_is_hidden(filepath) {
-                        // if file is in a hidden path, skip it
-                        continue;
-                    } else if has_extension_filter {
-                        // if user requested extension filter, filter on it
-                        if path_has_extension(filepath, extension.as_ref().unwrap()) {
-                            ReplaceCommand::regex_replace(
-                                &filepath,
-                                &re,
-                                &replace,
-                                &nobu,
-                                &mut writer,
-                            )?;
-                        } // otherwise skip
-                    } else {
-                        ReplaceCommand::regex_replace(
-                            &filepath,
-                            &re,
-                            &replace,
-                            &nobu,
-                            &mut writer,
-                        )?;
-                    }
-                }
-            }
-            Ok(())
-        } else {
-            Err(anyhow!("failure to parse replace subcommand."))
-        }
-    }
-}
-
-impl ReplaceCommand {
-    pub(crate) fn regex_replace(
-        filepath: &Path,
-        re: &Regex,
-        replace: &str,
-        no_backup: &bool,
-        writer: &mut impl Write,
-    ) -> Result<()> {
-        match read_to_string(&filepath) {
-            Ok(filestr) => {
-                // bail if no matches so that we don't
-                // write files that are not changed
-                if re.is_match(&filestr) {
-                    let post_replace_string = re.replace_all(&filestr, replace);
-
-                    if *no_backup == false {
-                        // Write backup of original file
-                        // This is the default behavior when user
-                        // does not use an explicit flag on the
-                        // command line
-                        let backup_file = OpenOptions::new()
-                            .write(true)
-                            .create(true)
-                            .truncate(true)
-                            .open(get_backup_filepath(filepath))?;
-                        let mut backup_buffer = BufWriter::new(backup_file);
-                        backup_buffer.write_all(&filestr.as_bytes())?;
-                        backup_buffer.flush()?;
-                    }
-
-                    // write replacement string inplace
-                    let replace_file = OpenOptions::new()
-                        .write(true)
-                        .create(true)
-                        .truncate(true)
-                        .open(filepath)?;
-                    let mut buffer = BufWriter::new(replace_file);
-
-                    buffer.write_all(post_replace_string.as_bytes())?;
-                    buffer.flush()?;
-                    writeln!(writer, "{} updated", filepath.display())?;
-                }
-            }
-            Err(error) => match error.kind() {
-                // If this was due to invalid UTF-8 conversion
-                // on file read, then skip the file.
-                // The intent is to test files with valid
-                // UTF-8 encodings only in this subcommand
-                ErrorKind::InvalidData => {}
-                _ => return Err(anyhow!(error)),
-            },
-        }
+        println!("Sub-command 'replace' is not implemented yet.  Follow issue https://github.com/chrissimpkins/recurse/issues/6 for progress.");
         Ok(())
+        // if let Recurse::Replace {
+        //     extension,
+        //     hidden,
+        //     nobu,
+        //     mindepth,
+        //     maxdepth,
+        //     symlinks,
+        //     find,
+        //     inpath,
+        //     replace,
+        // } = subcmd
+        // {
+        //     // Protect against accidental attempts to replace every path beginning at root
+        //     // when a path typo of `/` (Unix) or `\` (Win) is used on the command line
+        //     if is_root_filepath(&inpath) {
+        //         return Err(anyhow!(
+        //             "recurse does not support replacements originating on the file path '{}'",
+        //             inpath.display()
+        //         ));
+        //     }
+        //     let has_extension_filter = extension.is_some();
+        //     let re = Regex::new(&find)?;
+        //     for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
+        //         if entry.metadata().unwrap().is_file() {
+        //             let filepath = entry.path();
+        //             if has_backup_extension(&filepath) {
+        //                 // If file has the backup extension that is used by
+        //                 // this application, do not perform string replacement
+        //                 // in that file.
+        //                 continue;
+        //             } else if !hidden && path_is_hidden(filepath) {
+        //                 // if file is in a hidden path, skip it
+        //                 continue;
+        //             } else if has_extension_filter {
+        //                 // if user requested extension filter, filter on it
+        //                 if path_has_extension(filepath, extension.as_ref().unwrap()) {
+        //                     ReplaceCommand::regex_replace(
+        //                         &filepath,
+        //                         &re,
+        //                         &replace,
+        //                         &nobu,
+        //                         &mut writer,
+        //                     )?;
+        //                 } // otherwise skip
+        //             } else {
+        //                 ReplaceCommand::regex_replace(
+        //                     &filepath,
+        //                     &re,
+        //                     &replace,
+        //                     &nobu,
+        //                     &mut writer,
+        //                 )?;
+        //             }
+        //         }
+        //     }
+        //     Ok(())
+        // } else {
+        //     Err(anyhow!("failure to parse replace subcommand."))
+        // }
     }
 }
+
+// impl ReplaceCommand {
+//     pub(crate) fn regex_replace(
+//         filepath: &Path,
+//         re: &Regex,
+//         replace: &str,
+//         no_backup: &bool,
+//         writer: &mut impl Write,
+//     ) -> Result<()> {
+//         match read_to_string(&filepath) {
+//             Ok(filestr) => {
+//                 // bail if no matches so that we don't
+//                 // write files that are not changed
+//                 if re.is_match(&filestr) {
+//                     let post_replace_string = re.replace_all(&filestr, replace);
+
+//                     if *no_backup == false {
+//                         // Write backup of original file
+//                         // This is the default behavior when user
+//                         // does not use an explicit flag on the
+//                         // command line
+//                         let backup_file = OpenOptions::new()
+//                             .write(true)
+//                             .create(true)
+//                             .truncate(true)
+//                             .open(get_backup_filepath(filepath))?;
+//                         let mut backup_buffer = BufWriter::new(backup_file);
+//                         backup_buffer.write_all(&filestr.as_bytes())?;
+//                         backup_buffer.flush()?;
+//                     }
+
+//                     // write replacement string inplace
+//                     let replace_file = OpenOptions::new()
+//                         .write(true)
+//                         .create(true)
+//                         .truncate(true)
+//                         .open(filepath)?;
+//                     let mut buffer = BufWriter::new(replace_file);
+
+//                     buffer.write_all(post_replace_string.as_bytes())?;
+//                     buffer.flush()?;
+//                     writeln!(writer, "{} updated", filepath.display())?;
+//                 }
+//             }
+//             Err(error) => match error.kind() {
+//                 // If this was due to invalid UTF-8 conversion
+//                 // on file read, then skip the file.
+//                 // The intent is to test files with valid
+//                 // UTF-8 encodings only in this subcommand
+//                 ErrorKind::InvalidData => {}
+//                 _ => return Err(anyhow!(error)),
+//             },
+//         }
+//         Ok(())
+//     }
+// }
 
 fn get_backup_filepath(inpath: &Path) -> PathBuf {
     match inpath.extension() {
