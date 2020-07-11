@@ -24,6 +24,17 @@ impl Command for ContainsCommand {
             inpath,
         } = subcmd
         {
+            // ------------
+            // Validations
+            // ------------
+            // 1) inpath exists, if not bail with error
+            if !inpath.exists() {
+                return Err(anyhow!(format!(
+                    "no such file or directory '{}'",
+                    inpath.display()
+                )));
+            }
+
             let has_extension_filter = extension.is_some();
             let regex = Regex::new(&find)?;
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
@@ -79,5 +90,32 @@ impl ContainsCommand {
             },
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_contains_subcmd_invalid_inpath_validation() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: "test".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        // invalid directory path should raise error
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("no such file or directory"));
     }
 }
