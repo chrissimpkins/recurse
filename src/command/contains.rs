@@ -138,4 +138,32 @@ mod tests {
             .to_string()
             .contains("failure to parse contains subcommand"));
     }
+
+    #[test]
+    fn test_contains_invalid_filetype_non_utf8_binary_is_not_logged() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: ".*".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/librecurse.rlib"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        assert!(output_vec.len() == 1);
+        assert!(output_vec[0] == "");
+    }
+
+    // TODO: test file needs:
+    // - text files to confirm functionality:
+    //   -- contains text that matches regex
+    //   -- does not contain text that matches regex
+    //   -- hidden file with text match
+    //   -- multiple extensions to test extension filters
+    //   -- multi sub-directory structure for min and max depth tests
 }
