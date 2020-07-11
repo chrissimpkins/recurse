@@ -118,4 +118,24 @@ mod tests {
             .to_string()
             .contains("no such file or directory"));
     }
+
+    #[test]
+    fn test_contains_invalid_recurse_enum_arg() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("failure to parse contains subcommand"));
+    }
 }
