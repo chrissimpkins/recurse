@@ -81,7 +81,7 @@ The default behavior is modified with command line options.  Supported options f
 #### `walk` Syntax
 
 ```
-$ recurse walk [OPTIONS] [ARGS] [START PATH]
+$ recurse walk [OPTIONS] [START PATH]
 ```
 
 The default behavior of the walk sub-command is to list all file paths that are not hidden in the standard output stream.  Hidden paths are defined as a directory or file that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directories and files below a hidden directory path are considered hidden.  Directory traversal proceeds to the max directory depth below the user-specified start path `[START PATH]`.
