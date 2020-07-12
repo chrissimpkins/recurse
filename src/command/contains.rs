@@ -302,7 +302,7 @@ mod tests {
     }
 
     #[test]
-    fn test_contains_unicode_extended_devanagari() {
+    fn test_contains_unicode_devanagari() {
         let rw = Recurse::Contains {
             extension: None,
             find: r"ऄ".to_string(),
