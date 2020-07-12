@@ -159,11 +159,145 @@ mod tests {
         assert!(output_vec[0] == "");
     }
 
-    // TODO: test file needs:
-    // - text files to confirm functionality:
-    //   -- contains text that matches regex
-    //   -- does not contain text that matches regex
-    //   -- hidden file with text match
-    //   -- multiple extensions to test extension filters
-    //   -- multi sub-directory structure for min and max depth tests
+    #[test]
+    fn test_contains_default_match() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md"));
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        assert!(output_vec.len() == 3);
+        assert!(output_vec[2] == "");
+    }
+
+    #[test]
+    fn test_contains_hidden_match() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md"));
+        assert!(output_string.contains("tests_testfiles_contains_dir1_.test-hidden.txt"));
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        assert!(output_vec.len() == 4);
+        assert!(output_vec[3] == "");
+    }
+
+    #[test]
+    fn test_contains_filter_match() {
+        let rw = Recurse::Contains {
+            extension: Some("txt".to_string()),
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_contains_filter_hidden_match() {
+        let rw = Recurse::Contains {
+            extension: Some("txt".to_string()),
+            find: r"\d\d\d\d".to_string(),
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        assert!(output_string.contains("tests_testfiles_contains_dir1_.test-hidden.txt"));
+        assert!(output_vec.len() == 3);
+        assert!(output_vec[2] == "");
+    }
+
+    #[test]
+    fn test_contains_maxdepth_match() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: Some(1),
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_contains_mindepth_match() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: Some(2),
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
 }
