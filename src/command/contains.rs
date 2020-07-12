@@ -300,4 +300,27 @@ mod tests {
         assert!(output_vec.len() == 2);
         assert!(output_vec[1] == "");
     }
+
+    #[test]
+    fn test_contains_unicode_extended_devanagari() {
+        let rw = Recurse::Contains {
+            extension: None,
+            find: r"ऄ".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ContainsCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.txt"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
 }
