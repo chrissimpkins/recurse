@@ -22,7 +22,9 @@ The following sub-commands are in development:
 - [*coming in v0.3.0*] `recurse find`: identify lines in text files that match regular expression patterns.  The initial implementation is available for testing as of commit [8bf65ee](https://github.com/chrissimpkins/recurse/commit/8bf65ee7ebe93ac6698001d860fcbd94ae1d138d)
 - [*coming in v0.4.0*] `recurse replace`: replace strings in text files that match regular expression patterns
 
-See the Usage section below for additional details.
+See the [Usage section](#usage) below for additional details.
+
+See the [FAQ.md](FAQ.md) for answers to frequently asked questions.
 
 ## Installation
 
