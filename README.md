@@ -15,7 +15,7 @@ The `recurse` executable is a cross-platform, command line file management tool 
 Features are available through sub-commands of the `recurse` executable. Support currently includes:
 
 - `recurse walk`: recursive directory traversal file listings
-- `recurse contains`: identify text file paths with valid UTF-8 text strings that match regular expression patterns
+- `recurse contains`: identify text file paths with valid UTF-8 encoded Unicode scalar values that match regular expression patterns
 
 The following sub-commands are in development:
 
@@ -64,7 +64,7 @@ Recursive directory traversal is the default behavior across all sub-commands.
 $ recurse contains [OPTIONS] [REGEX] [START PATH]
 ```
 
-The default behavior of the contains sub-command is to list all valid UTF-8 text file paths with one or more strings that match a regular expression pattern `[REGEX]`.  Hidden paths are excluded by default and are defined as a directory or file path that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directories and file paths below a hidden directory are considered hidden.  Directory traversal proceeds to the max directory depth below the user-specified start path `[START PATH]`.
+The default behavior of the contains sub-command is to list all valid text file paths with one or more UTF-8 encoded Unicode scalar values that match a regular expression pattern `[REGEX]`.  Hidden paths are excluded by default and are defined as a directory or file path that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directories and file paths below a hidden directory are considered hidden.  Directory traversal proceeds to the max directory depth below the user-specified start path `[START PATH]`.
 
 #### `contains` Options
 
