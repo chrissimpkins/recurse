@@ -79,14 +79,12 @@ impl FindCommand {
                         for mat in re.find_iter(line) {
                             writeln!(
                                 writer,
-                                "{} {}:{}-{} {} {} {}",
+                                "{} {} {} {} {}",
                                 &filepath.display(),
-                                &line_number.to_string().green(),
-                                &mat.start().to_string().green(),
-                                &mat.end().to_string().green(),
-                                "[".dimmed(),
-                                &mat.as_str().red().bold(),
-                                "]".dimmed(),
+                                format!("{}:{}-{}", &line_number, &mat.start(), &mat.end()).green(),
+                                "[".dimmed().bold(),
+                                &mat.as_str().red(),
+                                "]".dimmed().bold(),
                             )?;
                         }
                     }
