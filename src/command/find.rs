@@ -174,11 +174,12 @@ mod tests {
     fn test_find_default_match() {
         // setup
         env::set_var("NO_COLOR", "1");
+
         let rw = Recurse::Find {
             extension: None,
             find: r"\d\d\d\d".to_string(),
             hidden: false,
-            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
             mindepth: None,
             maxdepth: None,
             symlinks: false,
@@ -190,11 +191,165 @@ mod tests {
         let output_vec: Vec<&str> = output_slice.split("\n").collect();
         let mut output_string = output_slice.replace("/", "_");
         output_string = output_string.replace(r"\", "_");
-        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md 2:0-4 [ 1010 ]"));
-        assert!(
-            output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt 2:0-4 [ 1010 ]")
-        );
+        assert!(output_string.contains("tests_testfiles_find_dir1_test1.md 2:0-4 [ 1010 ]"));
+        assert!(output_string.contains("tests_testfiles_find_dir1_dir2_test2.txt 2:0-4 [ 1010 ]"));
         assert!(output_vec.len() == 3);
         assert!(output_vec[2] == "");
+    }
+
+    #[test]
+    fn test_find_hidden_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
+
+        let rw = Recurse::Find {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_test1.md 2:0-4 [ 1010 ]"));
+        assert!(output_string.contains("tests_testfiles_find_dir1_.test-hidden.txt 2:0-4 [ 1010 ]"));
+        assert!(output_string.contains("tests_testfiles_find_dir1_dir2_test2.txt 2:0-4 [ 1010 ]"));
+        assert!(output_vec.len() == 4);
+        assert!(output_vec[3] == "");
+    }
+
+    #[test]
+    fn test_find_filter_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
+
+        let rw = Recurse::Find {
+            extension: Some("txt".to_string()),
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_dir2_test2.txt 2:0-4 [ 1010 ]"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_find_filter_hidden_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
+
+        let rw = Recurse::Find {
+            extension: Some("txt".to_string()),
+            find: r"\d\d\d\d".to_string(),
+            hidden: true,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_dir2_test2.txt 2:0-4 [ 1010 ]"));
+        assert!(output_string.contains("tests_testfiles_find_dir1_.test-hidden.txt 2:0-4 [ 1010 ]"));
+        assert!(output_vec.len() == 3);
+        assert!(output_vec[2] == "");
+    }
+
+    #[test]
+    fn test_find_maxdepth_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
+
+        let rw = Recurse::Find {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: None,
+            maxdepth: Some(1),
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_test1.md 2:0-4 [ 1010 ]"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_find_mindepth_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
+
+        let rw = Recurse::Find {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: Some(2),
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_dir2_test2.txt 2:0-4 [ 1010 ]"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
+    }
+
+    #[test]
+    fn test_find_unicode_devanagari() {
+        let rw = Recurse::Find {
+            extension: None,
+            find: r"ऄ".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/find/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_find_dir1_test1.txt 4:0-3 [ ऄ ]"));
+        assert!(output_vec.len() == 2);
+        assert!(output_vec[1] == "");
     }
 }
