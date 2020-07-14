@@ -25,6 +25,17 @@ impl Command for FindCommand {
             inpath,
         } = subcmd
         {
+            // ------------
+            // Validations
+            // ------------
+            // 1) inpath exists, if not bail with error
+            if !inpath.exists() {
+                return Err(anyhow!(format!(
+                    "no such file or directory '{}'",
+                    inpath.display()
+                )));
+            }
+
             let has_extension_filter = extension.is_some();
             let re = Regex::new(&find)?;
             for entry in walk(inpath, &mindepth, &maxdepth, &symlinks).filter_map(|f| f.ok()) {
@@ -91,5 +102,52 @@ impl FindCommand {
             },
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_find_subcmd_invalid_inpath_validation() {
+        let rw = Recurse::Find {
+            extension: None,
+            find: "test".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        // invalid directory path should raise error
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("no such file or directory"));
+    }
+
+    #[test]
+    fn test_find_invalid_recurse_enum_arg() {
+        let rw = Recurse::Walk {
+            extension: None,
+            dir_only: false,
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("failure to parse find subcommand"));
     }
 }
