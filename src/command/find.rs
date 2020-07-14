@@ -148,4 +148,52 @@ mod tests {
             .to_string()
             .contains("failure to parse find subcommand"));
     }
+
+    #[test]
+    fn test_find_invalid_filetype_non_utf8_binary_is_not_logged() {
+        let rw = Recurse::Find {
+            extension: None,
+            find: ".*".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/find/librecurse.rlib"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        assert!(output_vec.len() == 1);
+        assert!(output_vec[0] == "");
+    }
+
+    #[test]
+    fn test_find_default_match() {
+        let rw = Recurse::Find {
+            extension: None,
+            find: r"\d\d\d\d".to_string(),
+            hidden: false,
+            inpath: PathBuf::from("tests/testfiles/contains/dir1"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = FindCommand::execute(rw, &mut output);
+        assert!(res.is_ok());
+        let output_slice = std::str::from_utf8(&output).unwrap();
+        let output_vec: Vec<&str> = output_slice.split("\n").collect();
+        let mut output_string = output_slice.replace("/", "_");
+        output_string = output_string.replace(r"\", "_");
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md"));
+        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
+        let re = Regex::new(r"\d{1,3}:\d{1,3}\-\d{1,3}").unwrap();
+        for mat in re.find_iter(&output_string) {
+            assert!(mat.as_str() == "2:0-4");
+        }
+        assert!(output_vec.len() == 3);
+        assert!(output_vec[2] == "");
+    }
 }
