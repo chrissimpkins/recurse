@@ -106,6 +106,7 @@ impl FindCommand {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::env;
     use std::path::PathBuf;
 
     #[test]
@@ -171,6 +172,8 @@ mod tests {
 
     #[test]
     fn test_find_default_match() {
+        // setup
+        env::set_var("NO_COLOR", "1");
         let rw = Recurse::Find {
             extension: None,
             find: r"\d\d\d\d".to_string(),
@@ -187,12 +190,10 @@ mod tests {
         let output_vec: Vec<&str> = output_slice.split("\n").collect();
         let mut output_string = output_slice.replace("/", "_");
         output_string = output_string.replace(r"\", "_");
-        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md"));
-        assert!(output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt"));
-        let re = Regex::new(r"\d{1,3}:\d{1,3}\-\d{1,3}").unwrap();
-        for mat in re.find_iter(&output_string) {
-            assert!(mat.as_str() == "2:0-4");
-        }
+        assert!(output_string.contains("tests_testfiles_contains_dir1_test1.md 2:0-4 [ 1010 ]"));
+        assert!(
+            output_string.contains("tests_testfiles_contains_dir1_dir2_test2.txt 2:0-4 [ 1010 ]")
+        );
         assert!(output_vec.len() == 3);
         assert!(output_vec[2] == "");
     }
