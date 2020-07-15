@@ -10,17 +10,18 @@
 
 ## About
 
-The `recurse` executable is a cross-platform, command line file management tool with *default* recursive directory traversal and regular expression pattern matching support.  It is built in Rust and tested against the stable, beta, and nightly Rust toolchains on GNU/Linux, macOS, and Windows platforms.
+The `recurse` executable is a cross-platform command line tool for file management with *default* recursive directory traversal and regular expression pattern matching support.  It is built in Rust and tested against the stable, beta, and nightly Rust toolchains on GNU/Linux, macOS, and Windows platforms.
 
 Features are available through sub-commands of the `recurse` executable. Support currently includes:
 
+- `recurse contains`: identify valid UTF-8 encoded text file paths that match regular expression patterns
+- `recurse find`: identify lines and byte offsets that match regular expression patterns in valid UTF-8 encoded text files
 - `recurse walk`: recursive directory traversal file listings
-- `recurse contains`: identify text file paths with valid UTF-8 encoded Unicode scalar values that match regular expression patterns
 
-The following sub-commands are in development:
+The following features are in development:
 
-- [*coming in v0.3.0*] `recurse find`: identify lines in text files that match regular expression patterns.  The initial implementation is available for testing as of commit [8bf65ee](https://github.com/chrissimpkins/recurse/commit/8bf65ee7ebe93ac6698001d860fcbd94ae1d138d)
-- [*coming in v0.4.0*] `recurse replace`: replace strings in text files that match regular expression patterns
+- [*coming in v0.4.0*] `recurse replace`: replace strings in text files that match regular expression patterns (issue #6)
+- [*coming in v0.5.0*] add optional canonical Unicode normalization support for text input to sub-commands that support text matching (issue #8)
 
 See the [Usage section](#usage) below for additional details.
 
@@ -66,11 +67,45 @@ Recursive directory traversal is the default behavior across all sub-commands.
 $ recurse contains [OPTIONS] [REGEX] [START PATH]
 ```
 
-The default behavior of the contains sub-command is to list all valid text file paths with one or more UTF-8 encoded Unicode scalar values that match a regular expression pattern `[REGEX]`.  Hidden paths are excluded by default and are defined as a directory or file path that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directories and file paths below a hidden directory are considered hidden.  Directory traversal proceeds to the max directory depth below the user-specified start path `[START PATH]`.
+The contains sub-command's default behavior is to list all text file paths with one or more valid UTF-8 encoded Unicode scalar values that match a regular expression pattern `[REGEX]`.  Hidden paths are excluded by default and are defined as a directory or file path that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directory and file paths below a hidden directory are considered hidden.  Directory traversal proceeds to the max depth below the user-specified start path `[START PATH]`.
 
 #### `contains` Options
 
-The default behavior is modified with command line options.  Supported options for the `contains` sub-command include:
+Command line options modify the default behavior. Supported options for the `contains` sub-command are:
+
+- `-a | --all`: Include hidden file and directory paths
+- `-e | --ext [EXTENSION]`: Filter on paths that include an EXTENSION string.  Enter an EXTENSION string argument to define the extension filter.  The EXTENSION argument may be defined with or without a period character (e.g., `txt` or `.txt`)
+- `--maxdepth [DEPTH]`: maximum depth to extend traversal of file system sub-directory structure.  Enter an integer value for DEPTH to limit the directory traversal.
+- `--mindepth [DEPTH]`: minimum depth to begin traversal of file system sub-directory structure.  Enter an integer value for DEPTH to limit the directory traversal.
+- `--symlinks`: Follow symbolic links
+
+### [`find` sub-command]()
+
+#### `find` Syntax
+
+```
+$ recurse find [OPTIONS] [REGEX] [START PATH]
+```
+
+The `find` sub-command's default behavior is to list all lines in text files with valid UTF-8 encoded Unicode scalar values that match a regular expression pattern `[REGEX]`.  The report includes the following data for each line in a file with a match:
+
+```
+[FILEPATH] [LINE NUMBER]:[START BYTE OFFSET INDEX]-[END BYTE OFFSET INDEX] [ MATCHED STRING ]
+```
+
+Here is an example of a match result on the regular expression pattern `[Rr]ecurse` in this repository:
+
+```
+./src/command/find.rs 12:11-18 [ Recurse ]
+```
+
+Note that the byte offsets will not map 1:1 to "character offsets" when multi-byte encoded characters are in or before the matched string in a given line of text.
+
+Hidden paths are excluded by default and are defined as a directory or file path that begins with a period (e.g., `.hidden` directory or `.hiddent.txt` file).  All directory and file paths below a hidden directory are considered hidden.  Directory traversal proceeds to the max depth below the user-specified start path `[START PATH]`.
+
+#### `find` Options
+
+Command line options modify the default behavior. Supported options for the `find` sub-command are:
 
 - `-a | --all`: Include hidden file and directory paths
 - `-e | --ext [EXTENSION]`: Filter on paths that include an EXTENSION string.  Enter an EXTENSION string argument to define the extension filter.  The EXTENSION argument may be defined with or without a period character (e.g., `txt` or `.txt`)
@@ -86,11 +121,11 @@ The default behavior is modified with command line options.  Supported options f
 $ recurse walk [OPTIONS] [START PATH]
 ```
 
-The default behavior of the walk sub-command is to list all file paths that are not hidden in the standard output stream.  Hidden paths are defined as a directory or file that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directories and files below a hidden directory path are considered hidden.  Directory traversal proceeds to the max directory depth below the user-specified start path `[START PATH]`.
+The walk sub-command's default behavior is to list all file paths that are not hidden in the standard output stream.  Hidden paths are defined as a directory or file that begins with a period (e.g., `.hidden` directory or `.hidden.txt` file).  All directory and file paths below a hidden directory path are considered hidden.  Directory traversal proceeds to the max depth below the user-specified start path `[START PATH]`.
 
 #### `walk` Options
 
-The default behavior is modified with command line options.  Supported options for the `walk` sub-command include:
+Command line options modify the default behavior. Supported options for the `walk` sub-command are:
 
 - `-a | --all`: Include hidden file and directory paths
 - `-d | --dir`: Filter on directory paths only, do not list file paths
