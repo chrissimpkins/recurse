@@ -28,6 +28,16 @@ impl Command for ReplaceCommand {
             replace,
         } = subcmd
         {
+            // ------------
+            // Validations
+            // ------------
+            // 1) inpath exists, if not bail with error
+            if !inpath.exists() {
+                return Err(anyhow!(format!(
+                    "no such file or directory '{}'",
+                    inpath.display()
+                )));
+            }
             // Protect against accidental attempts to replace every path beginning at root
             // when a path typo of `/` (Unix) or `\` (Win) is used on the command line
             if is_root_filepath(&inpath) {
@@ -163,8 +173,31 @@ fn is_root_filepath(inpath: &Path) -> bool {
 mod tests {
     use super::*;
 
+    #[test]
+    fn test_replace_subcmd_invalid_inpath_validation() {
+        let rw = Recurse::Replace {
+            find: "test".to_string(),
+            replace: "test".to_string(),
+            nobu: false,
+            extension: None,
+            hidden: false,
+            inpath: PathBuf::from("path/to/bogus"),
+            mindepth: None,
+            maxdepth: None,
+            symlinks: false,
+        };
+        let mut output = Vec::new();
+        let res = ReplaceCommand::execute(rw, &mut output);
+        // invalid directory path should raise error
+        assert!(res.is_err());
+        assert!(res
+            .unwrap_err()
+            .to_string()
+            .contains("no such file or directory"));
+    }
+
     // ======================================
-    // get_secondary_filepath tests
+    // get_secondary_filepath function tests
     // ======================================
     #[test]
     fn test_get_secondary_filepath_with_txt_extension() {
@@ -193,7 +226,7 @@ mod tests {
         );
     }
     // ======================================
-    // has_secondary_extension tests
+    // has_secondary_extension function tests
     // ======================================
     #[test]
     fn test_has_secondary_extension_with_secondary_extension() {
@@ -214,7 +247,7 @@ mod tests {
     }
 
     // ======================================
-    // is_root_filepath tests
+    // is_root_filepath function tests
     // ======================================
     #[test]
     fn test_is_root_filepath_with_unix_root() {
