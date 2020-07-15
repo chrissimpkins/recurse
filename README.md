@@ -142,4 +142,4 @@ Contributions under the Apache License, v2.0 are welcomed.  Please open a pull r
 
 ## License
 
-This project is licensed under the Apache License, v2.0.  See [LICENSE.md](LICENSE.md) for the full text of the license.
+Apache License, v2.0.  See [LICENSE.md](LICENSE.md) for the full text of the license.
