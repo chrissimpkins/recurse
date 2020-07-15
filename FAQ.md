@@ -18,3 +18,8 @@ Yes, you can include Unicode characters on the command line in your regular expr
 
 Please see https://docs.rs/regex/#unicode and https://github.com/rust-lang/regex/blob/master/UNICODE.md.
 
+## ANSI Escape Code Color
+
+### I don't like ANSI escape code colors in my terminal. How do I turn this off?
+
+Some sub-commands include ANSI escape code color output by default when output is viewed in a terminal. This project supports the [NO_COLOR](https://no-color.org/) environment variable specification.  Please follow the link for additional details about how to set your environment variable to disable ANSI colors.
