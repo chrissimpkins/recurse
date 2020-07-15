@@ -233,7 +233,7 @@ dependencies = [
 
 [[package]]
 name = "recurse"
-version = "0.3.0-pre1"
+version = "0.3.0"
 dependencies = [
  "anyhow",
  "assert_cmd",

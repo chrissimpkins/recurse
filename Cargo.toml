@@ -7,7 +7,7 @@ license     = "Apache-2.0"
 name        = "recurse"
 readme      = "README.md"
 repository  = "https://github.com/chrissimpkins/recurse"
-version     = "0.3.0-pre1"
+version     = "0.3.0"
 
 [dependencies]
 anyhow    = "1.0"
