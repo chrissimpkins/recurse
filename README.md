@@ -57,7 +57,9 @@ $ recurse [SUB-COMMAND] --help
 
 The help menu displays available options and required arguments.
 
-Recursive directory traversal is the default behavior across all sub-commands.  
+Recursive directory traversal is the default behavior across all sub-commands. 
+
+The regular expression syntax support is documented [here](https://docs.rs/regex/#syntax).
 
 ### [`contains` sub-command]()
 
