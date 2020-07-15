@@ -14,8 +14,8 @@ The `recurse` executable is a cross-platform command line tool for file manageme
 
 Features are available through sub-commands of the `recurse` executable. Support currently includes:
 
-- `recurse contains`: identify valid UTF-8 encoded text file paths that match regular expression patterns
-- `recurse find`: identify lines and byte offsets that match regular expression patterns in valid UTF-8 encoded text files
+- `recurse contains`: identify valid UTF-8 encoded text file paths with contents that match regular expression patterns
+- `recurse find`: identify regular expression pattern match line and byte offsets in valid UTF-8 encoded text files
 - `recurse walk`: recursive directory traversal file listings
 
 The following features are in development:
