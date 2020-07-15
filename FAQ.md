@@ -8,11 +8,13 @@ The `recurse` executable uses the Rust `regex` crate for execution of regular ex
 
 > Its syntax is similar to Perl-style regular expressions, but lacks a few features like look around and backreferences.
 
+The regular expression syntax support is documented in [https://docs.rs/regex/#syntax](https://docs.rs/regex/#syntax).
+
 Detailed `regex` crate documentation is available at https://docs.rs/regex.
 
 ### Can I use Unicode characters in my regular expression?
 
-Yes, you can include Unicode characters on the command line in your regular expression pattern.
+You can include *UTF-8* encoded characters on the command line in your regular expression pattern.
 
 ### Where can I find more detailed information about the Unicode support in regular expression patterns?
 
