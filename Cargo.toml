@@ -18,5 +18,5 @@ colored = "2.0"
 regex   = "1.5"
 
 [dev-dependencies]
-assert_cmd = "1.0.8"
+assert_cmd = "2.0.0"
 predicates = "2"
